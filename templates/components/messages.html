@@ -2,6 +2,7 @@
 <div class='fixed top-4 right-4 z-50 flex flex-col gap-2 w-full max-w-sm pointer-events-none' aria-live='polite' aria-label='Notifications'>
     {% for message in messages %}
     <div role='alert'
+        data-message
         class='flex items-start gap-3 px-4 py-3 rounded-lg border text-sm shadow-lg pointer-events-auto
         {% if message.tags == "success" %}bg-emerald-500/10 border-emerald-500/20 text-emerald-400
         {% elif message.tags == "error" %}bg-rose-500/10 border-rose-500/20 text-rose-400
@@ -51,4 +52,13 @@
     </div>
     {% endfor %}
 </div>
+<script>
+document.querySelectorAll('[data-message]').forEach(function(el) {
+    setTimeout(function() {
+        el.style.transition = 'opacity 0.5s';
+        el.style.opacity = '0';
+        setTimeout(function() { el.remove(); }, 500);
+    }, 5000);
+});
+</script>
 {% endif %}

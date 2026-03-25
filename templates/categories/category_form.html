@@ -7,6 +7,23 @@
 {% block content %}
 <div class='max-w-lg mx-auto'>
 
+    {# Breadcrumbs #}
+    <nav aria-label='Breadcrumb' class='mb-4'>
+        <ol class='flex items-center gap-2 text-sm text-gray-500'>
+            <li>
+                <a href='{% url "categories:list" %}' class='hover:text-gray-300 transition-colors duration-200'>
+                    Categories
+                </a>
+            </li>
+            <li aria-hidden='true'><span class='text-gray-700'>/</span></li>
+            {% if form.instance.pk %}
+            <li class='text-gray-300 font-medium' aria-current='page'>Edit</li>
+            {% else %}
+            <li class='text-gray-300 font-medium' aria-current='page'>Create</li>
+            {% endif %}
+        </ol>
+    </nav>
+
     {# Back link #}
     <a href='{% url "categories:list" %}'
         class='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition-colors duration-200 mb-6'>
