@@ -25,6 +25,12 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
+AI_PROVIDER_CHOICES = [
+    ('anthropic', 'Anthropic (Claude)'),
+    ('openai', 'OpenAI (GPT)'),
+]
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
@@ -33,6 +39,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    ai_provider = models.CharField(
+        max_length=20,
+        choices=AI_PROVIDER_CHOICES,
+        default='anthropic',
+    )
+    ai_api_key = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text='Your AI provider API key. Stored in plaintext — use a dedicated key.',
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

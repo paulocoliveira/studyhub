@@ -49,7 +49,7 @@ class SuggestCategoryView(LoginRequiredMixin, View):
                 status=429,
             )
 
-        result = AIService().suggest_category(title, url or None, category_names)
+        result = AIService(user=request.user).suggest_category(title, url or None, category_names)
 
         if result is None:
             return JsonResponse(
@@ -84,7 +84,7 @@ class GenerateDescriptionView(LoginRequiredMixin, View):
                 status=429,
             )
 
-        result = AIService().generate_description(
+        result = AIService(user=request.user).generate_description(
             title, url or None, content_type or None
         )
 
@@ -108,7 +108,7 @@ class GenerateInsightsView(LoginRequiredMixin, View):
             )
 
         stats = DashboardService(user=request.user).get_stats()
-        result = AIService().generate_insights(stats)
+        result = AIService(user=request.user).generate_insights(stats)
 
         if result is None:
             return JsonResponse(

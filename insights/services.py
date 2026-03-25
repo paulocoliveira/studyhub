@@ -1,6 +1,7 @@
 import time
 
 import anthropic
+import openai as openai_sdk
 from django.conf import settings
 
 
@@ -30,10 +31,40 @@ def check_rate_limit(session, action_key, max_calls=10, window_seconds=3600):
 
 
 class AIService:
-    MODEL = 'claude-haiku-4-5-20251001'
+    ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001'
+    OPENAI_MODEL = 'gpt-4o-mini'
 
-    def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    def __init__(self, user=None):
+        self.user = user
+        self.provider = getattr(user, 'ai_provider', 'anthropic') if user else 'anthropic'
+        api_key = (getattr(user, 'ai_api_key', '') or '') if user else ''
+        if not api_key:
+            api_key = getattr(settings, 'ANTHROPIC_API_KEY', '')
+        self.api_key = api_key
+
+    def _call_ai(self, prompt: str) -> str | None:
+        """Send a prompt to the configured AI provider. Returns text or None on failure."""
+        if not self.api_key:
+            return None
+        try:
+            if self.provider == 'openai':
+                client = openai_sdk.OpenAI(api_key=self.api_key)
+                response = client.chat.completions.create(
+                    model=self.OPENAI_MODEL,
+                    messages=[{'role': 'user', 'content': prompt}],
+                    max_tokens=500,
+                )
+                return response.choices[0].message.content.strip()
+            else:
+                client = anthropic.Anthropic(api_key=self.api_key)
+                response = client.messages.create(
+                    model=self.ANTHROPIC_MODEL,
+                    max_tokens=500,
+                    messages=[{'role': 'user', 'content': prompt}],
+                )
+                return response.content[0].text.strip()
+        except Exception:
+            return None
 
     def suggest_category(self, title, url, user_categories):
         """
@@ -41,111 +72,47 @@ class AIService:
         """
         if not user_categories:
             return None
-
-        categories_list = ', '.join(user_categories)
-        url_part = f' (URL: {url})' if url else ''
+        cats = ', '.join(user_categories)
         prompt = (
-            f'Given this content:\n'
-            f'Title: {title}{url_part}\n\n'
-            f'And these available categories: {categories_list}\n\n'
-            f'Which single category best matches this content? '
-            f'Reply with ONLY the category name, nothing else.'
+            f'Given a content item titled "{title}"'
+            + (f' with URL {url}' if url else '')
+            + f', and these available categories: {cats}. '
+            f'Reply with ONLY the single best matching category name from the list, nothing else.'
         )
-
-        try:
-            response = self.client.messages.create(
-                model=self.MODEL,
-                max_tokens=100,
-                messages=[{'role': 'user', 'content': prompt}],
-            )
-            result_text = response.content[0].text.strip()
-            for category in user_categories:
-                if category.lower() == result_text.lower():
-                    return category
-            return user_categories[0]
-        except anthropic.APIError:
+        result = self._call_ai(prompt)
+        if not result:
             return None
-        except anthropic.APIConnectionError:
-            return None
-        except anthropic.RateLimitError:
-            return None
-        except anthropic.APITimeoutError:
-            return None
-        except Exception:
-            return None
+        result_lower = result.strip().lower()
+        for cat in user_categories:
+            if cat.lower() == result_lower:
+                return cat
+        return user_categories[0]
 
     def generate_description(self, title, url, content_type):
         """
         Returns a concise 2-3 sentence description string, or None on failure.
         """
-        url_part = f' (URL: {url})' if url else ''
-        type_part = f' (type: {content_type})' if content_type else ''
         prompt = (
-            f'Given this content:\n'
-            f'Title: {title}{url_part}{type_part}\n\n'
-            f'Write a concise 2-3 sentence description of what this content is likely about, '
-            f'suitable for a personal knowledge base. '
-            f'Reply with ONLY the description text, nothing else.'
+            f'Write a concise 2-3 sentence description for a {content_type or "content"} '
+            f'titled "{title}"'
+            + (f' at {url}' if url else '')
+            + '. Return only the description, no labels or preamble.'
         )
-
-        try:
-            response = self.client.messages.create(
-                model=self.MODEL,
-                max_tokens=200,
-                messages=[{'role': 'user', 'content': prompt}],
-            )
-            return response.content[0].text.strip()
-        except anthropic.APIError:
-            return None
-        except anthropic.APIConnectionError:
-            return None
-        except anthropic.RateLimitError:
-            return None
-        except anthropic.APITimeoutError:
-            return None
-        except Exception:
-            return None
+        return self._call_ai(prompt)
 
     def generate_insights(self, user_stats):
         """
-        Returns a markdown analysis string of the user's learning habits, or an error message.
+        Returns a markdown analysis string of the user's learning habits, or None on failure.
         """
         total = user_stats.get('total_contents', 0)
         by_status = user_stats.get('by_status', {})
         by_type = user_stats.get('by_type', [])
-
-        status_lines = '\n'.join(
-            f'  - {status}: {count}' for status, count in by_status.items()
-        )
-        type_lines = '\n'.join(
-            f'  - {item.get("content_type", "unknown")}: {item.get("count", 0)}'
-            for item in by_type
-        )
-
         prompt = (
-            f'Here are content consumption statistics for a learner:\n\n'
-            f'Total contents: {total}\n\n'
-            f'By status:\n{status_lines}\n\n'
-            f'By type:\n{type_lines}\n\n'
-            f'Provide a brief analysis (3-5 bullet points) of the user\'s learning habits '
-            f'and 2-3 actionable suggestions to improve. '
-            f'Format as markdown with **bold** headers. Keep it concise and encouraging.'
+            f'Analyze these learning content statistics and give 3-5 bullet points of insights '
+            f'and 2-3 actionable suggestions. Be encouraging and concise. '
+            f'Format with **bold** headers.\n\n'
+            f'Total items: {total}\n'
+            f'By status: {by_status}\n'
+            f'By type: {by_type}'
         )
-
-        try:
-            response = self.client.messages.create(
-                model=self.MODEL,
-                max_tokens=500,
-                messages=[{'role': 'user', 'content': prompt}],
-            )
-            return response.content[0].text
-        except anthropic.APIError:
-            return None
-        except anthropic.APIConnectionError:
-            return None
-        except anthropic.RateLimitError:
-            return None
-        except anthropic.APITimeoutError:
-            return None
-        except Exception:
-            return None
+        return self._call_ai(prompt)
