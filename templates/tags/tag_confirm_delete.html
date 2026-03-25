@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Tag — StudyHub{% endblock %}
+
+{% block content %}
+<div class='max-w-md mx-auto'>
+
+    {# Back link #}
+    <a href='{% url "tags:list" %}'
+        class='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition-colors duration-200 mb-6'>
+        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+            <polyline points='15 18 9 12 15 6'/>
+        </svg>
+        Back to Tags
+    </a>
+
+    {# Warning card #}
+    <div class='bg-rose-500/10 border border-rose-500/20 rounded-xl p-6'>
+
+        {# Warning icon #}
+        <div class='flex items-center gap-3 mb-4'>
+            <div class='w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-rose-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                    <path d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/>
+                    <line x1='12' y1='9' x2='12' y2='13'/>
+                    <line x1='12' y1='17' x2='12.01' y2='17'/>
+                </svg>
+            </div>
+            <h1 class='text-lg font-semibold text-gray-100'>Delete Tag</h1>
+        </div>
+
+        {# Confirmation message #}
+        <p class='text-sm text-gray-300 mb-2'>
+            Are you sure you want to delete
+            <strong class='text-white font-semibold'>{{ object.name }}</strong>?
+        </p>
+        <p class='text-sm text-gray-400 mb-6'>
+            This action cannot be undone. The tag will be removed from all associated content.
+        </p>
+
+        {# Actions #}
+        <div class='flex items-center gap-3'>
+            <form method='POST'>
+                {% csrf_token %}
+                <button type='submit'
+                    class='px-4 py-2 bg-rose-600 text-white text-sm font-medium rounded-lg
+                        hover:bg-rose-700 transition-all duration-200'>
+                    Delete
+                </button>
+            </form>
+            <a href='{% url "tags:list" %}'
+                class='px-4 py-2 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg
+                    border border-gray-700 hover:bg-gray-700 hover:text-white
+                    transition-all duration-200'>
+                Cancel
+            </a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

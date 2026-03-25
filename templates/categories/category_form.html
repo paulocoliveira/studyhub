@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Category{% else %}New Category{% endif %} — StudyHub
+{% endblock %}
+
+{% block content %}
+<div class='max-w-lg mx-auto'>
+
+    {# Back link #}
+    <a href='{% url "categories:list" %}'
+        class='inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-200 transition-colors duration-200 mb-6'>
+        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+            <polyline points='15 18 9 12 15 6'/>
+        </svg>
+        Back to Categories
+    </a>
+
+    {# Form card #}
+    <div class='bg-gray-900 border border-gray-800 rounded-2xl p-8'>
+
+        {# Card title #}
+        <h1 class='text-2xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent mb-6'>
+            {% if form.instance.pk %}Edit Category{% else %}New Category{% endif %}
+        </h1>
+
+        <form method='POST' novalidate>
+            {% csrf_token %}
+
+            {# Name field #}
+            <div class='mb-5'>
+                <label for='{{ form.name.id_for_label }}'
+                    class='block text-sm font-medium text-gray-400 mb-1'>
+                    Name <span class='text-rose-500' aria-hidden='true'>*</span>
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                    <p class='mt-1 text-xs text-rose-500' role='alert'>{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Description field #}
+            <div class='mb-7'>
+                <label for='{{ form.description.id_for_label }}'
+                    class='block text-sm font-medium text-gray-400 mb-1'>
+                    Description
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    {% for error in form.description.errors %}
+                    <p class='mt-1 text-xs text-rose-500' role='alert'>{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Non-field errors #}
+            {% if form.non_field_errors %}
+            <div class='mb-5 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20' role='alert'>
+                {% for error in form.non_field_errors %}
+                <p class='text-sm text-rose-400'>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Form actions #}
+            <div class='flex items-center gap-3'>
+                <button type='submit'
+                    class='px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600
+                        text-white text-sm font-medium rounded-lg
+                        hover:from-violet-500 hover:to-indigo-500
+                        transition-all duration-200 shadow-lg shadow-violet-500/25'>
+                    Save Category
+                </button>
+                <a href='{% url "categories:list" %}'
+                    class='px-5 py-2.5 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg
+                        border border-gray-700 hover:bg-gray-700 hover:text-white
+                        transition-all duration-200'>
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+{% endblock %}

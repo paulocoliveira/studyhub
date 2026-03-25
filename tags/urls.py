@@ -1,9 +1,11 @@
 from django.urls import path
 
-from tags.views import TagListView
+from . import views
 
 app_name = 'tags'
 
 urlpatterns = [
-    path('', TagListView.as_view(), name='list'),
+    path('', views.TagListView.as_view(), name='list'),
+    path('create/', views.TagCreateView.as_view(), name='create'),
+    path('<int:pk>/delete/', views.TagDeleteView.as_view(), name='delete'),
 ]
