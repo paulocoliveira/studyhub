@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -132,3 +133,6 @@ LOGIN_URL = '/users/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+# AI
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')

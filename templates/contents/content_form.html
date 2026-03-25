@@ -100,6 +100,14 @@
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
                     {% endfor %}
                     {% endif %}
+                    <div class='mt-2'>
+                        <button type='button'
+                            id='btn-suggest-category'
+                            data-url='{% url "insights:suggest_category" %}'
+                            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
+                            ✨ AI Suggest
+                        </button>
+                    </div>
                 </div>
 
                 {# Description #}
@@ -113,6 +121,14 @@
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
                     {% endfor %}
                     {% endif %}
+                    <div class='mt-2'>
+                        <button type='button'
+                            id='btn-generate-description'
+                            data-url='{% url "insights:generate_description" %}'
+                            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
+                            ✨ AI Generate
+                        </button>
+                    </div>
                 </div>
 
                 {# Tags #}
@@ -144,34 +160,6 @@
                     {% endif %}
                 </div>
 
-                {# AI placeholder (Sprint 5) #}
-                <div class='border border-dashed border-gray-700 rounded-xl p-5'>
-                    <div class='flex items-center gap-2 mb-3'>
-                        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-gray-600' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
-                            <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
-                        </svg>
-                        <p class='text-xs font-medium text-gray-600 uppercase tracking-wider'>AI Features — Sprint 5</p>
-                    </div>
-                    <div class='flex flex-wrap gap-2'>
-                        <button type='button' disabled
-                            class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                                bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed opacity-60'>
-                            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
-                                <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
-                            </svg>
-                            AI Suggest Category
-                        </button>
-                        <button type='button' disabled
-                            class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-                                bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed opacity-60'>
-                            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
-                                <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
-                            </svg>
-                            AI Generate Description
-                        </button>
-                    </div>
-                </div>
-
             </div>
 
             {# Form actions #}
@@ -197,4 +185,98 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie) {
+            document.cookie.split(';').forEach(function(cookie) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                }
+            });
+        }
+        return cookieValue;
+    }
+
+    async function aiRequest(url, method, body, btn, resultCallback) {
+        btn.disabled = true;
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<svg class="animate-spin h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Generating...';
+
+        try {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            const resp = await fetch(url, options);
+            const data = await resp.json();
+
+            if (data.success) {
+                resultCallback(data);
+            } else {
+                showAiError(btn, data.error || 'AI service unavailable. Try again later.');
+            }
+        } catch (e) {
+            showAiError(btn, 'Connection error. Please try again.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHTML;
+        }
+    }
+
+    function showAiError(btn, message) {
+        // Remove any existing error for this button
+        const existing = btn.parentElement.querySelector('.ai-error');
+        if (existing) existing.remove();
+
+        const err = document.createElement('p');
+        err.className = 'ai-error text-xs text-red-400 mt-1';
+        err.textContent = message;
+        btn.parentElement.appendChild(err);
+        setTimeout(function() { err.remove(); }, 5000);
+    }
+
+    // Suggest Category
+    document.getElementById('btn-suggest-category')?.addEventListener('click', function() {
+        const title = document.getElementById('id_title')?.value || '';
+        const url = document.getElementById('id_url')?.value || '';
+        const endpoint = this.dataset.url;
+
+        aiRequest(endpoint, 'POST', {title: title, url: url}, this, function(data) {
+            const select = document.getElementById('id_category');
+            if (select && data.category) {
+                const target = data.category.trim().toLowerCase();
+                for (const opt of select.options) {
+                    if (opt.text.trim().toLowerCase() === target) {
+                        select.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        });
+    });
+
+    // Generate Description
+    document.getElementById('btn-generate-description')?.addEventListener('click', function() {
+        const title = document.getElementById('id_title')?.value || '';
+        const url = document.getElementById('id_url')?.value || '';
+        const contentType = document.getElementById('id_content_type')?.value || '';
+        const endpoint = this.dataset.url;
+
+        aiRequest(endpoint, 'POST', {title: title, url: url, content_type: contentType}, this, function(data) {
+            const desc = document.getElementById('id_description');
+            if (desc && data.description) desc.value = data.description;
+        });
+    });
+</script>
 {% endblock %}
