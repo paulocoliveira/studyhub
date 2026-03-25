@@ -1,3 +1,3 @@
 from django.db import models
 
-# Create your models here.
+# Dashboard owns no models — it reads from other apps.

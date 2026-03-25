@@ -4,49 +4,49 @@
 
 > **Goal:** Initialize the Django project, set up TailwindCSS, create the custom user model with email-based auth, and build the landing page.
 
-- [ ] **1.1 — Initialize Django Project**
-  - [ ] 1.1.1 — Create a new Django project named `studyhub` with `core` as the settings module (`django-admin startproject core .`)
-  - [ ] 1.1.2 — Configure `core/settings.py`: set `AUTH_USER_MODEL`, `LOGIN_URL`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`, default language to `en-us`, timezone, static files configuration
-  - [ ] 1.1.3 — Create the directory structure for templates: `templates/`, `templates/components/`, `templates/users/`, `templates/dashboard/`, `templates/contents/`, `templates/categories/`, `templates/tags/`, `templates/insights/`
-  - [ ] 1.1.4 — Create `static/` directory structure: `static/css/`, `static/js/`, `static/images/`
-  - [ ] 1.1.5 — Configure `core/urls.py` with the root URL patterns including `admin/` and placeholder includes for all apps
+- [X] **1.1 — Initialize Django Project**
+  - [X] 1.1.1 — Create a new Django project named `studyhub` with `core` as the settings module (`django-admin startproject core .`)
+  - [X] 1.1.2 — Configure `core/settings.py`: set `AUTH_USER_MODEL`, `LOGIN_URL`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`, default language to `en-us`, timezone, static files configuration
+  - [X] 1.1.3 — Create the directory structure for templates: `templates/`, `templates/components/`, `templates/users/`, `templates/dashboard/`, `templates/contents/`, `templates/categories/`, `templates/tags/`, `templates/insights/`
+  - [X] 1.1.4 — Create `static/` directory structure: `static/css/`, `static/js/`, `static/images/`
+  - [X] 1.1.5 — Configure `core/urls.py` with the root URL patterns including `admin/` and placeholder includes for all apps
 
-- [ ] **1.2 — Set Up TailwindCSS**
-  - [ ] 1.2.1 — Add TailwindCSS via CDN in the base template `<head>` tag with the Inter font from Google Fonts
-  - [ ] 1.2.2 — Configure the TailwindCSS `tailwind.config` inline script in the base template to extend the default theme with custom colors if needed
+- [X] **1.2 — Set Up TailwindCSS**
+  - [X] 1.2.1 — Add TailwindCSS via CDN in the base template `<head>` tag with the Inter font from Google Fonts
+  - [X] 1.2.2 — Configure the TailwindCSS `tailwind.config` inline script in the base template to extend the default theme with custom colors if needed
 
-- [ ] **1.3 — Create Base Templates**
-  - [ ] 1.3.1 — Create `templates/base_public.html`: HTML5 boilerplate, TailwindCSS CDN, Inter font, dark background (`bg-gray-950`), responsive meta viewport, block `title`, block `content`
-  - [ ] 1.3.2 — Create `templates/base.html`: extends structure with sidebar navigation, top bar with user info and logout, flash messages area, block `title`, block `content`. Sidebar includes nav links to: Dashboard, Contents, Categories, Tags, Insights
-  - [ ] 1.3.3 — Create `templates/components/sidebar.html`: reusable sidebar component with navigation items, active state handling using `{% url %}` and current path comparison
-  - [ ] 1.3.4 — Create `templates/components/topbar.html`: top bar with page title block, user email display, and logout button
-  - [ ] 1.3.5 — Create `templates/components/messages.html`: reusable flash messages component styled with success/error/warning/info variants
+- [X] **1.3 — Create Base Templates**
+  - [X] 1.3.1 — Create `templates/base_public.html`: HTML5 boilerplate, TailwindCSS CDN, Inter font, dark background (`bg-gray-950`), responsive meta viewport, block `title`, block `content`
+  - [X] 1.3.2 — Create `templates/base.html`: extends structure with sidebar navigation, top bar with user info and logout, flash messages area, block `title`, block `content`. Sidebar includes nav links to: Dashboard, Contents, Categories, Tags, Insights
+  - [X] 1.3.3 — Create `templates/components/sidebar.html`: reusable sidebar component with navigation items, active state handling using `{% url %}` and current path comparison
+  - [X] 1.3.4 — Create `templates/components/topbar.html`: top bar with page title block, user email display, and logout button
+  - [X] 1.3.5 — Create `templates/components/messages.html`: reusable flash messages component styled with success/error/warning/info variants
 
-- [ ] **1.4 — Create Users App & Custom User Model**
-  - [ ] 1.4.1 — Create the `users` app: `python manage.py startapp users`
-  - [ ] 1.4.2 — Define `CustomUser` model in `users/models.py`: extend `AbstractBaseUser` and `PermissionsMixin`, use email as `USERNAME_FIELD`, add `first_name`, `last_name`, `is_active`, `is_staff`, `created_at`, `updated_at` fields. Create `CustomUserManager` with `create_user` and `create_superuser` methods
-  - [ ] 1.4.3 — Register `CustomUser` in `users/admin.py` with `UserAdmin` customization for email-based display
-  - [ ] 1.4.4 — Create and run migrations for the `users` app
+- [X] **1.4 — Create Users App & Custom User Model**
+  - [X] 1.4.1 — Create the `users` app: `python manage.py startapp users`
+  - [X] 1.4.2 — Define `CustomUser` model in `users/models.py`: extend `AbstractBaseUser` and `PermissionsMixin`, use email as `USERNAME_FIELD`, add `first_name`, `last_name`, `is_active`, `is_staff`, `created_at`, `updated_at` fields. Create `CustomUserManager` with `create_user` and `create_superuser` methods
+  - [X] 1.4.3 — Register `CustomUser` in `users/admin.py` with `UserAdmin` customization for email-based display
+  - [X] 1.4.4 — Create and run migrations for the `users` app
   - [ ] 1.4.5 — Create a superuser for admin access
 
-- [ ] **1.5 — Build Authentication Views**
-  - [ ] 1.5.1 — Create `users/forms.py` with `CustomUserCreationForm` (fields: email, first_name, last_name, password1, password2) and `EmailAuthenticationForm` (overriding `AuthenticationForm` to use email)
-  - [ ] 1.5.2 — Create `RegisterView` in `users/views.py`: CBV using `CreateView` with `CustomUserCreationForm`, redirects to login on success with a success message
-  - [ ] 1.5.3 — Create `CustomLoginView` in `users/views.py`: CBV extending `LoginView` with `EmailAuthenticationForm`, redirects to dashboard on success
-  - [ ] 1.5.4 — Create `CustomLogoutView` in `users/views.py`: CBV extending `LogoutView`, redirects to landing page
-  - [ ] 1.5.5 — Create `CustomPasswordChangeView` in `users/views.py`: CBV extending `PasswordChangeView`, redirects to dashboard with success message
-  - [ ] 1.5.6 — Configure `users/urls.py` with URL patterns: `register/`, `login/`, `logout/`, `password-change/`
-  - [ ] 1.5.7 — Include `users.urls` in `core/urls.py`
+- [X] **1.5 — Build Authentication Views**
+  - [X] 1.5.1 — Create `users/forms.py` with `CustomUserCreationForm` (fields: email, first_name, last_name, password1, password2) and `EmailAuthenticationForm` (overriding `AuthenticationForm` to use email)
+  - [X] 1.5.2 — Create `RegisterView` in `users/views.py`: CBV using `CreateView` with `CustomUserCreationForm`, redirects to login on success with a success message
+  - [X] 1.5.3 — Create `CustomLoginView` in `users/views.py`: CBV extending `LoginView` with `EmailAuthenticationForm`, redirects to dashboard on success
+  - [X] 1.5.4 — Create `CustomLogoutView` in `users/views.py`: CBV extending `LogoutView`, redirects to landing page
+  - [X] 1.5.5 — Create `CustomPasswordChangeView` in `users/views.py`: CBV extending `PasswordChangeView`, redirects to dashboard with success message
+  - [X] 1.5.6 — Configure `users/urls.py` with URL patterns: `register/`, `login/`, `logout/`, `password-change/`
+  - [X] 1.5.7 — Include `users.urls` in `core/urls.py`
 
-- [ ] **1.6 — Build Authentication Templates**
-  - [ ] 1.6.1 — Create `templates/users/register.html`: registration form page extending `base_public.html`, styled with design system (dark card, gradient accents, form inputs per design system spec)
-  - [ ] 1.6.2 — Create `templates/users/login.html`: login form page extending `base_public.html`, matching registration page design, with link to register
-  - [ ] 1.6.3 — Create `templates/users/password_change.html`: password change form extending `base.html` (authenticated layout)
+- [X] **1.6 — Build Authentication Templates**
+  - [X] 1.6.1 — Create `templates/users/register.html`: registration form page extending `base_public.html`, styled with design system (dark card, gradient accents, form inputs per design system spec)
+  - [X] 1.6.2 — Create `templates/users/login.html`: login form page extending `base_public.html`, matching registration page design, with link to register
+  - [X] 1.6.3 — Create `templates/users/password_change.html`: password change form extending `base.html` (authenticated layout)
 
-- [ ] **1.7 — Build Landing Page**
-  - [ ] 1.7.1 — Create `LandingPageView` in `core/views.py` (or a dedicated view): simple `TemplateView` that renders the landing page. If user is authenticated, redirect to dashboard
-  - [ ] 1.7.2 — Create `templates/landing.html`: extends `base_public.html`. Hero section with gradient text title, subtitle, and CTA buttons (Sign Up, Log In). Features section with 3–4 feature cards. Footer with basic info
-  - [ ] 1.7.3 — Wire the landing page as the root URL `/` in `core/urls.py`
+- [X] **1.7 — Build Landing Page**
+  - [X] 1.7.1 — Create `LandingPageView` in `core/views.py` (or a dedicated view): simple `TemplateView` that renders the landing page. If user is authenticated, redirect to dashboard
+  - [X] 1.7.2 — Create `templates/landing.html`: extends `base_public.html`. Hero section with gradient text title, subtitle, and CTA buttons (Sign Up, Log In). Features section with 3–4 feature cards. Footer with basic info
+  - [X] 1.7.3 — Wire the landing page as the root URL `/` in `core/urls.py`
 
 ---
 
@@ -55,7 +55,7 @@
 > **Goal:** Build the Categories and Tags apps with full CRUD and user-scoped data.
 
 - [ ] **2.1 — Create Categories App**
-  - [ ] 2.1.1 — Create the `categories` app: `python manage.py startapp categories`
+  - [X] 2.1.1 — Create the `categories` app: `python manage.py startapp categories`
   - [ ] 2.1.2 — Define `Category` model in `categories/models.py`: fields `name` (CharField, max_length=100), `description` (TextField, blank=True), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `created_at`, `updated_at`. Add `Meta` with `unique_together = ['name', 'user']` and `ordering = ['name']`
   - [ ] 2.1.3 — Register `Category` in `categories/admin.py`
   - [ ] 2.1.4 — Create and run migrations for the `categories` app
@@ -100,7 +100,7 @@
 > **Goal:** Build the Contents app with full CRUD, filtering, search, and sorting.
 
 - [ ] **3.1 — Create Contents App**
-  - [ ] 3.1.1 — Create the `contents` app: `python manage.py startapp contents`
+  - [X] 3.1.1 — Create the `contents` app: `python manage.py startapp contents`
   - [ ] 3.1.2 — Define `Content` model in `contents/models.py`: fields `title` (CharField, max_length=255), `url` (URLField, blank=True), `content_type` (CharField with choices), `description` (TextField, blank=True), `status` (CharField with choices, default='new'), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `category` (ForeignKey to `Category`, null=True, blank=True), `tags` (ManyToManyField to `Tag`, blank=True), `created_at`, `updated_at`. Add `Meta` with `ordering = ['-created_at']`
   - [ ] 3.1.3 — Define `CONTENT_TYPE_CHOICES` and `STATUS_CHOICES` as module-level constants in `contents/models.py`
   - [ ] 3.1.4 — Register `Content` in `contents/admin.py` with list display, list filter, and search fields
@@ -168,7 +168,7 @@
 > **Goal:** Integrate AI features for category suggestion, description generation, and consumption insights.
 
 - [ ] **5.1 — Create Insights App**
-  - [ ] 5.1.1 — Create the `insights` app: `python manage.py startapp insights`
+  - [X] 5.1.1 — Create the `insights` app: `python manage.py startapp insights`
   - [ ] 5.1.2 — Install the `anthropic` Python SDK: add to `requirements.txt`
   - [ ] 5.1.3 — Add `ANTHROPIC_API_KEY` setting in `core/settings.py` (read from environment variable)
   - [ ] 5.1.4 — Register the `insights` app in `INSTALLED_APPS`

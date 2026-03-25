@@ -1,3 +1,3 @@
 from django.contrib import admin
 
-# Register your models here.
+# Dashboard owns no models — nothing to register.

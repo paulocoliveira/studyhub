@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang='en' class='h-full'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>{% block title %}StudyHub{% endblock %}</title>
+
+    <!-- Inter font -->
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+
+    <!-- TailwindCSS CDN -->
+    <script src='https://cdn.tailwindcss.com'></script>
+
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class='min-h-full bg-gray-950 text-gray-100 antialiased'>
+
+    <!-- Flash messages -->
+    {% include 'components/messages.html' %}
+
+    <!-- App shell: sidebar + main area -->
+    <div class='flex min-h-screen'>
+
+        <!-- Sidebar (hidden on mobile, visible on lg+) -->
+        <div class='hidden lg:flex lg:flex-col lg:shrink-0'>
+            {% include 'components/sidebar.html' %}
+        </div>
+
+        <!-- Mobile sidebar overlay -->
+        <div id='mobile-sidebar-overlay'
+            class='fixed inset-0 z-40 bg-gray-950/80 backdrop-blur-sm hidden lg:hidden'
+            aria-hidden='true'
+            onclick='closeMobileSidebar()'>
+        </div>
+
+        <!-- Mobile sidebar drawer -->
+        <div id='mobile-sidebar'
+            class='fixed inset-y-0 left-0 z-50 flex flex-col -translate-x-full lg:hidden transition-transform duration-300'
+            aria-label='Mobile navigation'>
+            {% include 'components/sidebar.html' %}
+        </div>
+
+        <!-- Main content area -->
+        <div class='flex flex-col flex-1 min-w-0'>
+
+            <!-- Top bar -->
+            {% block topbar %}
+            {% include 'components/topbar.html' %}
+            {% endblock %}
+
+            <!-- Mobile menu button (shown only on small screens, inside topbar area) -->
+            <div class='lg:hidden fixed top-0 left-0 z-20 h-16 flex items-center px-4'>
+                <button type='button'
+                    onclick='openMobileSidebar()'
+                    class='p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-200'
+                    aria-label='Open navigation menu'>
+                    <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                        <line x1='3' y1='6' x2='21' y2='6'/>
+                        <line x1='3' y1='12' x2='21' y2='12'/>
+                        <line x1='3' y1='18' x2='21' y2='18'/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Page content -->
+            <main class='flex-1 p-4 md:p-6' id='main-content'>
+                {% block content %}{% endblock %}
+            </main>
+
+        </div>
+    </div>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        function openMobileSidebar() {
+            var sidebar = document.getElementById('mobile-sidebar');
+            var overlay = document.getElementById('mobile-sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            }
+        }
+
+        function closeMobileSidebar() {
+            var sidebar = document.getElementById('mobile-sidebar');
+            var overlay = document.getElementById('mobile-sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+    </script>
+
+</body>
+</html>

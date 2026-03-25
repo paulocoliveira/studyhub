@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Tags — StudyHub{% endblock %}
+
+{% block page_title %}Tags{% endblock %}
+
+{% block content %}
+<div class='max-w-4xl'>
+    <div class='mb-8'>
+        <h2 class='text-3xl font-bold text-gray-100'>Tags</h2>
+        <p class='mt-1 text-sm text-gray-400'>Label and cross-reference your content.</p>
+    </div>
+
+    <div class='bg-gradient-to-br from-gray-900 via-gray-900 to-violet-950/20 border border-violet-500/20 rounded-xl p-6'>
+        <div class='flex items-start gap-4'>
+            <div class='w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-violet-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                    <circle cx='12' cy='12' r='10'/>
+                    <line x1='12' y1='8' x2='12' y2='12'/>
+                    <line x1='12' y1='16' x2='12.01' y2='16'/>
+                </svg>
+            </div>
+            <div>
+                <h3 class='text-base font-semibold text-gray-100 mb-1'>Tags — Coming in Sprint 3</h3>
+                <p class='text-sm text-gray-400 leading-relaxed'>
+                    Tag management (create, delete, list with content counts) will be implemented in Sprint 3.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
