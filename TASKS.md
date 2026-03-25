@@ -133,12 +133,12 @@
 
 > **Goal:** Build the Dashboard app with aggregated stats and recent activity.
 
-- [ ] **4.1 — Create Dashboard App**
-  - [ ] 4.1.1 — Create the `dashboard` app directory structure (it doesn't need migrations as it has no models): `dashboard/__init__.py`, `dashboard/views.py`, `dashboard/services.py`
-  - [ ] 4.1.2 — Register the `dashboard` app in `INSTALLED_APPS`
+- [X] **4.1 — Create Dashboard App**
+  - [X] 4.1.1 — Create the `dashboard` app directory structure (it doesn't need migrations as it has no models): `dashboard/__init__.py`, `dashboard/views.py`, `dashboard/services.py`
+  - [X] 4.1.2 — Register the `dashboard` app in `INSTALLED_APPS`
 
-- [ ] **4.2 — Build Dashboard Service Layer**
-  - [ ] 4.2.1 — Create `dashboard/services.py` with a `DashboardService` class (or functions) that computes:
+- [X] **4.2 — Build Dashboard Service Layer**
+  - [X] 4.2.1 — Create `dashboard/services.py` with a `DashboardService` class (or functions) that computes:
     - Total content count for the user
     - Content count by status (new, in_progress, completed)
     - Content count by content type
@@ -146,20 +146,20 @@
     - 5 most recently completed content items (filtered by status='completed', ordered by `updated_at`)
     - Top 5 categories by content count
     - Top 5 tags by content count
-  - [ ] 4.2.2 — Use Django ORM aggregations (`Count`, `annotate`) for efficient queries
+  - [X] 4.2.2 — Use Django ORM aggregations (`Count`, `annotate`) for efficient queries
 
-- [ ] **4.3 — Build Dashboard View**
-  - [ ] 4.3.1 — Create `DashboardView` in `dashboard/views.py`: CBV using `TemplateView`, `LoginRequiredMixin`. Override `get_context_data` to call `DashboardService` and pass all stats to the template
+- [X] **4.3 — Build Dashboard View**
+  - [X] 4.3.1 — Create `DashboardView` in `dashboard/views.py`: CBV using `TemplateView`, `LoginRequiredMixin`. Override `get_context_data` to call `DashboardService` and pass all stats to the template
 
-- [ ] **4.4 — Build Dashboard Template**
-  - [ ] 4.4.1 — Create `templates/dashboard/dashboard.html`: extending `base.html`. Layout:
+- [X] **4.4 — Build Dashboard Template**
+  - [X] 4.4.1 — Create `templates/dashboard/dashboard.html`: extending `base.html`. Layout:
     - **Row 1:** Stats cards grid (total contents, new, in progress, completed) with colored accents per status
     - **Row 2:** Content type breakdown (compact list or small cards showing count per type)
     - **Row 3:** Two columns — "Recently Added" (list of 5 items with title, type, date) and "Recently Completed" (list of 5 items with title, type, completion date)
     - **Row 4:** Two columns — "Top Categories" (list with name + count) and "Top Tags" (list with name + count)
-  - [ ] 4.4.2 — Configure `dashboard/urls.py` with a single URL pattern: `''` → `DashboardView`
-  - [ ] 4.4.3 — Include `dashboard.urls` in `core/urls.py` under `dashboard/` prefix
-  - [ ] 4.4.4 — Update `LOGIN_REDIRECT_URL` in settings to point to the dashboard URL
+  - [X] 4.4.2 — Configure `dashboard/urls.py` with a single URL pattern: `''` → `DashboardView`
+  - [X] 4.4.3 — Include `dashboard.urls` in `core/urls.py` under `dashboard/` prefix
+  - [X] 4.4.4 — Update `LOGIN_REDIRECT_URL` in settings to point to the dashboard URL
 
 ---
 
