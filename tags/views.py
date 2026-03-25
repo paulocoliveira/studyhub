@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Count
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView
 
@@ -13,7 +14,10 @@ class TagListView(LoginRequiredMixin, ListView):
     context_object_name = 'tags'
 
     def get_queryset(self):
-        return Tag.objects.filter(user=self.request.user)
+        return (
+            Tag.objects.filter(user=self.request.user)
+            .annotate(content_count=Count('contents'))
+        )
 
 
 class TagCreateView(LoginRequiredMixin, CreateView):
