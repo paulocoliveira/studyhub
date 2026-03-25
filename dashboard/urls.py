@@ -1,14 +1,9 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import path
-from django.views.generic import TemplateView
 
-
-class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = 'dashboard/dashboard.html'
-
+from . import views
 
 app_name = 'dashboard'
 
 urlpatterns = [
-    path('', DashboardView.as_view(), name='index'),
+    path('', views.DashboardView.as_view(), name='home'),
 ]
