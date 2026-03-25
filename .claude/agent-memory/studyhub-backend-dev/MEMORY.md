@@ -1,0 +1,2 @@
+- [Sprint 1 Foundation](project_sprint1_foundation.md) — dashboard app had to be manually recreated; DB reset required when switching AUTH_USER_MODEL
+- [Sprint 2 Categories and Tags](project_sprint2_categories_tags.md) — full CRUD backend for categories and tags; Count('contents') annotation depends on related_name set on Content model (Sprint 3)
