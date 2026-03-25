@@ -124,8 +124,14 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+ALLOWED_UPLOAD_EXTENSIONS = [
+    '.pdf', '.jpg', '.jpeg', '.png', '.gif', '.webp',
+    '.mp3', '.mp4', '.doc', '.docx', '.txt', '.md',
+]
+MAX_UPLOAD_SIZE_MB = 10
 
 # Auth
 AUTH_USER_MODEL = 'users.CustomUser'

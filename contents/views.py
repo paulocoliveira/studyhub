@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -14,6 +15,7 @@ from django.views.generic import (
 
 from .forms import ContentFilterForm, ContentForm
 from .models import STATUS_CHOICES, Content
+from .services import LinkPreviewService
 
 ALLOWED_SORT_FIELDS = ['title', '-title', 'status', 'created_at', '-created_at']
 
@@ -141,3 +143,24 @@ class ContentStatusUpdateView(LoginRequiredMixin, View):
             )
         referer = request.META.get('HTTP_REFERER')
         return redirect(referer or reverse('contents:list'))
+
+
+class RefreshPreviewView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        content = get_object_or_404(Content, pk=pk, user=request.user)
+        if not content.url:
+            return JsonResponse(
+                {'success': False, 'error': 'No URL set for this content.'},
+                status=400,
+            )
+        preview = LinkPreviewService().fetch_preview(content.url)
+        if preview and preview.get('preview_image_url'):
+            content.preview_image_url = preview['preview_image_url']
+            content.save(update_fields=['preview_image_url'])
+            return JsonResponse(
+                {'success': True, 'preview_image_url': content.preview_image_url}
+            )
+        return JsonResponse(
+            {'success': False, 'error': 'No preview image found for this URL.'},
+            status=404,
+        )

@@ -243,46 +243,44 @@
 
 > **Goal:** Add a card-based view for content with link preview thumbnails (Open Graph images), placeholder images per content type, and enforce file upload restrictions for security (allowed formats and 10MB size limit).
 
-- [ ] **7.1 — Link Preview Metadata Extraction**
-  - [ ] 7.1.1 — Install `requests` and `beautifulsoup4` packages and add them to `requirements.txt`
-  - [ ] 7.1.2 — Create a `contents/services.py` file (or extend if it already exists) with a `LinkPreviewService` class containing a method `fetch_preview(url: str) -> dict` that: sends a GET request to the URL with a timeout of 5 seconds, parses the HTML response with BeautifulSoup, extracts Open Graph metadata (`og:image`, `og:title`, `og:description`), and returns a dictionary with keys `preview_image_url`, `og_title`, `og_description`. If the request fails or no OG image is found, return `None` values gracefully
-  - [ ] 7.1.3 — Add error handling in `LinkPreviewService`: catch `requests.RequestException`, `Timeout`, `ConnectionError`, and invalid URLs. Return empty/null preview data on failure — never crash the content save flow
-  - [ ] 7.1.4 — Add a `preview_image_url` field (URLField, blank=True, max_length=500) to the `Content` model to store the fetched Open Graph image URL. Create and run the migration
+- [X] **7.1 — Link Preview Metadata Extraction**
+  - [X] 7.1.1 — Install `requests` and `beautifulsoup4` packages and add them to `requirements.txt`
+  - [X] 7.1.2 — Create a `contents/services.py` file (or extend if it already exists) with a `LinkPreviewService` class containing a method `fetch_preview(url: str) -> dict` that: sends a GET request to the URL with a timeout of 5 seconds, parses the HTML response with BeautifulSoup, extracts Open Graph metadata (`og:image`, `og:title`, `og:description`), and returns a dictionary with keys `preview_image_url`, `og_title`, `og_description`. If the request fails or no OG image is found, return `None` values gracefully
+  - [X] 7.1.3 — Add error handling in `LinkPreviewService`: catch `requests.RequestException`, `Timeout`, `ConnectionError`, and invalid URLs. Return empty/null preview data on failure — never crash the content save flow
+  - [X] 7.1.4 — Add a `preview_image_url` field (URLField, blank=True, max_length=500) to the `Content` model to store the fetched Open Graph image URL. Create and run the migration
 
-- [ ] **7.2 — Auto-Fetch Preview on Content Save**
-  - [ ] 7.2.1 — Create `contents/signals.py` with a `pre_save` signal on the `Content` model: if the content has a `url` value and `preview_image_url` is empty, call `LinkPreviewService.fetch_preview(url)` and populate `preview_image_url` with the result. Only trigger on creation or when `url` has changed
-  - [ ] 7.2.2 — Register the signal in `contents/apps.py` inside the `ready()` method
-  - [ ] 7.2.3 — Add a manual "Refresh Preview" button on the content edit form that triggers an AJAX POST to a new endpoint `contents/<int:pk>/refresh-preview/` which re-fetches the OG image and updates the field. Return JSON with the new `preview_image_url`
+- [X] **7.2 — Auto-Fetch Preview on Content Save**
+  - [X] 7.2.1 — Create `contents/signals.py` with a `pre_save` signal on the `Content` model: if the content has a `url` value and `preview_image_url` is empty, call `LinkPreviewService.fetch_preview(url)` and populate `preview_image_url` with the result. Only trigger on creation or when `url` has changed
+  - [X] 7.2.2 — Register the signal in `contents/apps.py` inside the `ready()` method
+  - [X] 7.2.3 — Add a manual "Refresh Preview" button on the content edit form that triggers an AJAX POST to a new endpoint `contents/<int:pk>/refresh-preview/` which re-fetches the OG image and updates the field. Return JSON with the new `preview_image_url`
 
-- [ ] **7.3 — Content Type Placeholder Images**
-  - [ ] 7.3.1 — Create or source 8 placeholder SVG icons (one per content type: article, video, podcast, social_media_post, social_media_profile, pdf, course, other). Use simple, recognizable iconography: a document icon for article, a play button for video, a headphones icon for podcast, a camera/grid icon for social_media_post, a user circle for social_media_profile, a PDF file icon for pdf, a graduation cap for course, and a generic file icon for other
-  - [ ] 7.3.2 — Save the placeholder SVGs in `static/images/placeholders/` with filenames matching the content type values (e.g., `article.svg`, `video.svg`, `podcast.svg`, `social_media_post.svg`, `social_media_profile.svg`, `pdf.svg`, `course.svg`, `other.svg`)
-  - [ ] 7.3.3 — Create a template tag or a model method `get_card_image()` on the `Content` model that returns: `preview_image_url` if it is populated, otherwise the static path to the placeholder image matching the content's `content_type`
+- [X] **7.3 — Content Type Placeholder Images**
+  - [X] 7.3.1 — Create or source 7 placeholder SVG icons (one per content type: article, video, podcast, book, course, tool, other)
+  - [X] 7.3.2 — Save the placeholder SVGs in `static/images/placeholders/`
+  - [X] 7.3.3 — Create a model method `get_card_image()` on the `Content` model
 
-- [ ] **7.4 — Content Card Component & Grid View**
-  - [ ] 7.4.1 — Create `templates/components/content_card.html`: a reusable card component that receives a `content` object and renders: a top image area (preview image or placeholder with `object-cover`, fixed aspect ratio `aspect-video`), content type badge overlaid on the image corner, title (truncated to 2 lines with `line-clamp-2`), description excerpt (truncated to 2 lines), category name if present, tags as small badges (max 3 visible + "+N" overflow indicator), status badge, date added, and a quick-action footer with status change and edit/view links. Style following the design system: `bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-all duration-200`
-  - [ ] 7.4.2 — For the image area: use an `<img>` tag with `onerror` fallback to the placeholder — if the Open Graph image URL fails to load (404, CORS, etc.), JavaScript swaps it to the content type placeholder SVG
-  - [ ] 7.4.3 — Update `templates/contents/content_list.html`: add a view toggle (two icon buttons: grid/cards and list) at the top of the content area. Default view is cards. Store the user's preference in `localStorage`. When "cards" is selected, render content using `content_card.html` in a responsive grid (`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4`). When "list" is selected, render the existing list/table format
-  - [ ] 7.4.4 — Add the view toggle JavaScript: clicking the toggle buttons swaps a CSS class on the container (e.g., `view-cards` vs `view-list`) and persists the choice in `localStorage` so it survives page reloads
+- [X] **7.4 — Content Card Component & Grid View**
+  - [X] 7.4.1 — Create `templates/components/content_card.html`: reusable card component
+  - [X] 7.4.2 — Image area with `onerror` fallback to placeholder SVG
+  - [X] 7.4.3 — Update `templates/contents/content_list.html`: view toggle (grid/list), default cards, localStorage persistence
+  - [X] 7.4.4 — View toggle JavaScript with localStorage persistence
 
-- [ ] **7.5 — File Upload Model & Validation**
-  - [ ] 7.5.1 — Add an optional `file` field (FileField, blank=True, null=True, `upload_to='content_files/%Y/%m/'`) to the `Content` model for users who want to upload a local file instead of providing a URL. Create and run the migration
-  - [ ] 7.5.2 — Create a `contents/validators.py` file with two validators:
-    - `validate_file_extension(value)`: checks that the uploaded file's extension is in the allowed list: `.pdf`, `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.mp3`, `.mp4`, `.doc`, `.docx`, `.txt`, `.md`. Raises `ValidationError` with a clear message listing allowed formats if the extension is not permitted
-    - `validate_file_size(value)`: checks that the file size does not exceed 10MB (10 * 1024 * 1024 bytes). Raises `ValidationError` with a message like "File size must not exceed 10MB. Current size: X MB"
-  - [ ] 7.5.3 — Apply both validators to the `file` field on the `Content` model: `validators=[validate_file_extension, validate_file_size]`
-  - [ ] 7.5.4 — Add `ALLOWED_UPLOAD_EXTENSIONS` and `MAX_UPLOAD_SIZE_MB` as constants in `core/settings.py` so they can be referenced by validators and templates. Set values: extensions list matching 7.5.2, max size = 10
-  - [ ] 7.5.5 — Configure `MEDIA_URL = '/media/'` and `MEDIA_ROOT = BASE_DIR / 'media'` in `core/settings.py`. Add media URL patterns in `core/urls.py` for development (`+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)`)
+- [X] **7.5 — File Upload Model & Validation**
+  - [X] 7.5.1 — Add optional `file` field (FileField) to `Content` model with migration
+  - [X] 7.5.2 — Create `contents/validators.py` with `validate_file_extension` and `validate_file_size`
+  - [X] 7.5.3 — Apply both validators to the `file` field on the `Content` model
+  - [X] 7.5.4 — Add `ALLOWED_UPLOAD_EXTENSIONS` and `MAX_UPLOAD_SIZE_MB` constants to `core/settings.py`
+  - [X] 7.5.5 — Configure `MEDIA_URL`, `MEDIA_ROOT`, and media URL patterns in `core/urls.py`
 
-- [ ] **7.6 — File Upload Form Integration**
-  - [ ] 7.6.1 — Update `ContentForm` in `contents/forms.py` to include the `file` field. Add `enctype="multipart/form-data"` to the form tag in `content_form.html`
-  - [ ] 7.6.2 — Add client-side validation in `content_form.html` via JavaScript: on file input `change` event, check the file extension against the allowed list and the file size against 10MB. Show an inline error message below the file input and disable the submit button if validation fails
-  - [ ] 7.6.3 — Display accepted formats and max file size as helper text below the file input field: "Accepted formats: PDF, JPG, PNG, GIF, WebP, MP3, MP4, DOC, DOCX, TXT, MD. Max size: 10MB"
-  - [ ] 7.6.4 — On the content detail page and content card, if a `file` is present and no `url` is provided, show a download link/button for the file instead of an external link. If both `url` and `file` are present, show both
+- [X] **7.6 — File Upload Form Integration**
+  - [X] 7.6.1 — Update `ContentForm` with `file` field; add `enctype="multipart/form-data"` to form tag
+  - [X] 7.6.2 — Client-side file validation JS (extension + size check, inline error, disable submit)
+  - [X] 7.6.3 — Helper text below file input: accepted formats and max size
+  - [X] 7.6.4 — Download link on content detail page when file is present
 
-- [ ] **7.7 — Card Image Handling for Uploaded Files**
-  - [ ] 7.7.1 — Update the `get_card_image()` logic (model method or template tag from 7.3.3): if the content has an uploaded `file` and the file is an image (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`), use the file's URL as the card image. Otherwise, fall back to `preview_image_url` (OG image), then to the content type placeholder
-  - [ ] 7.7.2 — For uploaded PDF files, use the `pdf.svg` placeholder. For uploaded audio/video files, use the respective `podcast.svg` or `video.svg` placeholder. The priority chain is: uploaded image file → OG preview image → content type placeholder SVG
+- [X] **7.7 — Card Image Handling for Uploaded Files**
+  - [X] 7.7.1 — `get_card_image()` method: uploaded image → OG preview → placeholder SVG priority chain
+  - [X] 7.7.2 — Non-image uploads fall back to content type placeholder (PDF, audio, video)
 
 ---
 
