@@ -37,7 +37,7 @@
                 {% if content.content_type == 'article' %}
                 <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-violet-500/10 text-violet-400'>{{ content.get_content_type_display }}</span>
                 {% elif content.content_type == 'video' %}
-                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-red-500/10 text-red-400'>{{ content.get_content_type_display }}</span>
+                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-rose-500/10 text-rose-400'>{{ content.get_content_type_display }}</span>
                 {% elif content.content_type == 'podcast' %}
                 <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-orange-500/10 text-orange-400'>{{ content.get_content_type_display }}</span>
                 {% elif content.content_type == 'course' %}
@@ -75,6 +75,22 @@
                     <polyline points='15 3 21 3 21 9'/>
                     <line x1='10' y1='14' x2='21' y2='3'/>
                 </svg>
+            </a>
+        </div>
+        {% endif %}
+
+        {# Uploaded file #}
+        {% if content.file %}
+        <div class='mb-5'>
+            <p class='text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5'>File</p>
+            <a href='{{ content.file.url }}' download
+                class='inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-violet-400 bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 rounded-lg transition-colors duration-200'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                    <path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/>
+                    <polyline points='7 10 12 15 17 10'/>
+                    <line x1='12' y1='15' x2='12' y2='3'/>
+                </svg>
+                Download File
             </a>
         </div>
         {% endif %}

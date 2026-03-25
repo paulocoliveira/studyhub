@@ -45,7 +45,7 @@
             {% if form.instance.pk %}Edit Content{% else %}New Content{% endif %}
         </h1>
 
-        <form method='POST' novalidate>
+        <form method='POST' enctype='multipart/form-data' novalidate>
             {% csrf_token %}
 
             {# Non-field errors #}
@@ -79,6 +79,13 @@
                     </label>
                     {{ form.url }}
                     <p class='mt-1 text-xs text-gray-600'>Optional — paste a link to an article, video, etc.</p>
+                    {% if form.instance.pk and form.instance.url %}
+                    <button type='button' id='btn-refresh-preview'
+                        data-url='{% url "contents:refresh_preview" form.instance.pk %}'
+                        class='mt-2 inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-200 border border-gray-700 rounded-md transition-colors'>
+                        🔄 Refresh Preview
+                    </button>
+                    {% endif %}
                     {% if form.url.errors %}
                     {% for error in form.url.errors %}
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
@@ -178,6 +185,22 @@
                     {% endif %}
                     {% if form.tags.errors %}
                     {% for error in form.tags.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# File upload #}
+                <div>
+                    <label for='{{ form.file.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                        File <span class='text-gray-600 font-normal'>(optional)</span>
+                    </label>
+                    {{ form.file }}
+                    <p class='mt-1.5 text-xs text-gray-600'>
+                        Accepted: PDF, JPG, PNG, GIF, WebP, MP3, MP4, DOC, DOCX, TXT, MD · Max: 10MB
+                    </p>
+                    {% if form.file.errors %}
+                    {% for error in form.file.errors %}
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
                     {% endfor %}
                     {% endif %}
@@ -377,6 +400,53 @@
             this.classList.remove('border-red-500');
             this.parentElement.querySelector('.field-error')?.remove();
         });
+    });
+
+    // File upload client-side validation
+    document.getElementById('id_file')?.addEventListener('change', function() {
+        const file = this.files[0];
+        let errEl = this.parentElement.querySelector('.file-error');
+        if (!errEl) {
+            errEl = document.createElement('p');
+            errEl.className = 'file-error text-xs text-red-400 mt-1';
+            this.parentElement.appendChild(errEl);
+        }
+        const submitBtn = document.querySelector('[type="submit"]');
+        if (!file) { errEl.textContent = ''; if (submitBtn) submitBtn.disabled = false; return; }
+
+        const allowed = ['.pdf','.jpg','.jpeg','.png','.gif','.webp','.mp3','.mp4','.doc','.docx','.txt','.md'];
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+            errEl.textContent = 'File type "' + ext + '" is not allowed.';
+            if (submitBtn) submitBtn.disabled = true;
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            const mb = (file.size / (1024 * 1024)).toFixed(1);
+            errEl.textContent = 'File too large (' + mb + ' MB). Maximum allowed: 10 MB.';
+            if (submitBtn) submitBtn.disabled = true;
+            return;
+        }
+        errEl.textContent = '';
+        if (submitBtn) submitBtn.disabled = false;
+    });
+
+    // Refresh Preview button
+    document.getElementById('btn-refresh-preview')?.addEventListener('click', function() {
+        const btn = this;
+        const orig = btn.textContent;
+        btn.textContent = 'Refreshing...';
+        btn.disabled = true;
+        fetch(btn.dataset.url, {
+            method: 'POST',
+            headers: {'X-CSRFToken': getCookie('csrftoken')}
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.textContent = data.success ? '✓ Preview updated' : (data.error || 'No preview found');
+            setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+        })
+        .catch(() => { btn.textContent = orig; btn.disabled = false; });
     });
 </script>
 {% endblock %}

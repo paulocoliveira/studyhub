@@ -20,7 +20,10 @@ SELECT_CLASS = (
 class ContentForm(forms.ModelForm):
     class Meta:
         model = Content
-        fields = ['title', 'url', 'content_type', 'description', 'category', 'tags', 'status']
+        fields = [
+            'title', 'url', 'content_type', 'description',
+            'category', 'tags', 'status', 'file',
+        ]
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': INPUT_CLASS,
@@ -39,6 +42,16 @@ class ContentForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': SELECT_CLASS}),
             'tags': forms.CheckboxSelectMultiple(),
             'status': forms.Select(attrs={'class': SELECT_CLASS}),
+            'file': forms.ClearableFileInput(attrs={
+                'class': (
+                    'w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 '
+                    'file:rounded-lg file:border-0 file:text-sm file:font-medium '
+                    'file:bg-violet-600/10 file:text-violet-400 '
+                    'hover:file:bg-violet-600/20 bg-gray-800 border border-gray-700 '
+                    'rounded-lg px-3 py-2'
+                ),
+                'accept': '.pdf,.jpg,.jpeg,.png,.gif,.webp,.mp3,.mp4,.doc,.docx,.txt,.md',
+            }),
         }
 
     def __init__(self, *args, user=None, **kwargs):
