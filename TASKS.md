@@ -206,36 +206,36 @@
 
 > **Goal:** Improve UX, fix edge cases, add responsive refinements, and ensure design consistency.
 
-- [ ] **6.1 — Responsive Design Audit**
-  - [ ] 6.1.1 — Test all pages at mobile viewport (375px) and fix layout issues: sidebar collapses to hamburger menu, forms stack vertically, cards go single column
-  - [ ] 6.1.2 — Test all pages at tablet viewport (768px) and fix: 2-column grids, proper spacing
-  - [ ] 6.1.3 — Add mobile sidebar toggle: hamburger icon in top bar, sidebar slides in as overlay on mobile, close on backdrop click or navigation
+- [X] **6.1 — Responsive Design Audit**
+  - [X] 6.1.1 — Test all pages at mobile viewport (375px) and fix layout issues: sidebar collapses to hamburger menu, forms stack vertically, cards go single column
+  - [X] 6.1.2 — Test all pages at tablet viewport (768px) and fix: 2-column grids, proper spacing
+  - [X] 6.1.3 — Add mobile sidebar toggle: hamburger icon in top bar, sidebar slides in as overlay on mobile, close on backdrop click or navigation
 
-- [ ] **6.2 — Empty States**
-  - [ ] 6.2.1 — Add empty state UI to content list when no items exist: illustration/icon + "No content saved yet" message + CTA button to add first content
-  - [ ] 6.2.2 — Add empty state UI to categories list when no categories exist
-  - [ ] 6.2.3 — Add empty state UI to tags list when no tags exist
-  - [ ] 6.2.4 — Add empty state UI to dashboard when user has no content: welcome message + suggested first steps
+- [X] **6.2 — Empty States**
+  - [X] 6.2.1 — Add empty state UI to content list when no items exist: illustration/icon + "No content saved yet" message + CTA button to add first content
+  - [X] 6.2.2 — Add empty state UI to categories list when no categories exist
+  - [X] 6.2.3 — Add empty state UI to tags list when no tags exist
+  - [X] 6.2.4 — Add empty state UI to dashboard when user has no content: welcome message + suggested first steps
 
-- [ ] **6.3 — Flash Messages & Feedback**
-  - [ ] 6.3.1 — Ensure all CRUD operations trigger appropriate Django messages (success on create/edit/delete, error on failure)
-  - [ ] 6.3.2 — Add auto-dismiss behavior to flash messages (fade out after 5 seconds) via JavaScript
-  - [ ] 6.3.3 — Add confirmation modals for delete actions (replace the separate confirmation page with an inline modal if desired, or keep as-is for simplicity)
+- [X] **6.3 — Flash Messages & Feedback**
+  - [X] 6.3.1 — Ensure all CRUD operations trigger appropriate Django messages (success on create/edit/delete, error on failure)
+  - [X] 6.3.2 — Add auto-dismiss behavior to flash messages (fade out after 5 seconds) via JavaScript
+  - [X] 6.3.3 — Add confirmation modals for delete actions (replace the separate confirmation page with an inline modal if desired, or keep as-is for simplicity)
 
-- [ ] **6.4 — Navigation Enhancements**
-  - [ ] 6.4.1 — Highlight the active sidebar link based on the current URL path
-  - [ ] 6.4.2 — Add breadcrumbs to detail and form pages (e.g., Contents > Content Title > Edit)
-  - [ ] 6.4.3 — Add a "Back" link to all form and detail pages
+- [X] **6.4 — Navigation Enhancements**
+  - [X] 6.4.1 — Highlight the active sidebar link based on the current URL path
+  - [X] 6.4.2 — Add breadcrumbs to detail and form pages (e.g., Contents > Content Title > Edit)
+  - [X] 6.4.3 — Add a "Back" link to all form and detail pages
 
-- [ ] **6.5 — Content Form UX**
-  - [ ] 6.5.1 — Add tag input as a multi-select with checkboxes or a tag-picker component (using simple JS or Django widget)
-  - [ ] 6.5.2 — Add client-side form validation feedback (required fields highlighted before submit)
-  - [ ] 6.5.3 — Auto-detect content type from URL if possible (e.g., YouTube URL → video, Instagram URL → social_media_post) using simple JavaScript regex matching
+- [X] **6.5 — Content Form UX**
+  - [X] 6.5.1 — Add tag input as a multi-select with checkboxes or a tag-picker component (using simple JS or Django widget)
+  - [X] 6.5.2 — Add client-side form validation feedback (required fields highlighted before submit)
+  - [X] 6.5.3 — Auto-detect content type from URL if possible (e.g., YouTube URL → video, Instagram URL → social_media_post) using simple JavaScript regex matching
 
-- [ ] **6.6 — Design Consistency Review**
-  - [ ] 6.6.1 — Audit all templates against the design system: verify color usage, button styles, input styles, typography, spacing, and border radius are consistent
-  - [ ] 6.6.2 — Ensure all pages use the same card style, badge style, and grid patterns
-  - [ ] 6.6.3 — Verify gradient usage is consistent (hero, buttons, accents)
+- [X] **6.6 — Design Consistency Review**
+  - [X] 6.6.1 — Audit all templates against the design system: verify color usage, button styles, input styles, typography, spacing, and border radius are consistent
+  - [X] 6.6.2 — Ensure all pages use the same card style, badge style, and grid patterns
+  - [X] 6.6.3 — Verify gradient usage is consistent (hero, buttons, accents)
 
 ---
 

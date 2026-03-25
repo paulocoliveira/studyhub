@@ -5,6 +5,29 @@
 {% block content %}
 <div class='max-w-2xl mx-auto'>
 
+    {# Breadcrumbs #}
+    <nav aria-label='Breadcrumb' class='mb-4'>
+        <ol class='flex items-center gap-2 text-sm text-gray-500'>
+            <li>
+                <a href='{% url "contents:list" %}' class='hover:text-gray-300 transition-colors duration-200'>
+                    Contents
+                </a>
+            </li>
+            <li aria-hidden='true'><span class='text-gray-700'>/</span></li>
+            {% if form.instance.pk %}
+            <li>
+                <a href='{% url "contents:detail" form.instance.pk %}' class='hover:text-gray-300 transition-colors duration-200 truncate max-w-xs inline-block'>
+                    {{ form.instance.title }}
+                </a>
+            </li>
+            <li aria-hidden='true'><span class='text-gray-700'>/</span></li>
+            <li class='text-gray-300 font-medium' aria-current='page'>Edit</li>
+            {% else %}
+            <li class='text-gray-300 font-medium' aria-current='page'>Create</li>
+            {% endif %}
+        </ol>
+    </nav>
+
     {# Back link #}
     <a href='{% url "contents:list" %}'
         class='inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200 mb-6'>
@@ -266,6 +289,36 @@
         });
     });
 
+    // Auto-detect content type from URL on blur
+    (function() {
+        var urlInput = document.getElementById('id_url');
+        var typeSelect = document.getElementById('id_content_type');
+        if (!urlInput || !typeSelect) return;
+
+        var patterns = [
+            { regex: /youtube\.com|youtu\.be/i, type: 'video' },
+            { regex: /spotify\.com|podcasts?\./i, type: 'podcast' },
+            { regex: /instagram\.com|twitter\.com|x\.com|tiktok\.com/i, type: 'social_media_post' },
+            { regex: /amazon\.com\/.*book|goodreads\.com/i, type: 'book' },
+            { regex: /udemy\.com|coursera\.org|edx\.org|pluralsight\.com/i, type: 'course' },
+        ];
+
+        urlInput.addEventListener('blur', function() {
+            var url = this.value.trim();
+            if (!url) return;
+            // Only auto-set if user hasn't made a selection (empty or first/default option)
+            var currentVal = typeSelect.value;
+            if (currentVal && currentVal !== typeSelect.options[0].value) return;
+
+            for (var i = 0; i < patterns.length; i++) {
+                if (patterns[i].regex.test(url)) {
+                    typeSelect.value = patterns[i].type;
+                    break;
+                }
+            }
+        });
+    }());
+
     // Generate Description
     document.getElementById('btn-generate-description')?.addEventListener('click', function() {
         const title = document.getElementById('id_title')?.value || '';
@@ -276,6 +329,53 @@
         aiRequest(endpoint, 'POST', {title: title, url: url, content_type: contentType}, this, function(data) {
             const desc = document.getElementById('id_description');
             if (desc && data.description) desc.value = data.description;
+        });
+    });
+
+    // Client-side validation
+    document.querySelector('form')?.addEventListener('submit', function(e) {
+        let valid = true;
+
+        // Clear previous errors
+        document.querySelectorAll('.field-error').forEach(el => el.remove());
+        document.querySelectorAll('.border-red-500').forEach(el => {
+            el.classList.remove('border-red-500');
+        });
+
+        // Required: title
+        const titleField = document.getElementById('id_title');
+        if (titleField && !titleField.value.trim()) {
+            valid = false;
+            titleField.classList.add('border-red-500');
+            const err = document.createElement('p');
+            err.className = 'field-error text-xs text-red-400 mt-1';
+            err.textContent = 'Title is required.';
+            titleField.parentElement.appendChild(err);
+        }
+
+        // Required: content_type
+        const typeField = document.getElementById('id_content_type');
+        if (typeField && !typeField.value) {
+            valid = false;
+            typeField.classList.add('border-red-500');
+            const err = document.createElement('p');
+            err.className = 'field-error text-xs text-red-400 mt-1';
+            err.textContent = 'Content type is required.';
+            typeField.parentElement.appendChild(err);
+        }
+
+        if (!valid) {
+            e.preventDefault();
+            // Scroll to first error
+            document.querySelector('.field-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    // Clear error state on input
+    ['id_title', 'id_content_type'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', function() {
+            this.classList.remove('border-red-500');
+            this.parentElement.querySelector('.field-error')?.remove();
         });
     });
 </script>

@@ -5,6 +5,19 @@
 {% block content %}
 <div class='max-w-3xl mx-auto'>
 
+    {# Breadcrumbs #}
+    <nav aria-label='Breadcrumb' class='mb-4'>
+        <ol class='flex items-center gap-2 text-sm text-gray-500'>
+            <li>
+                <a href='{% url "contents:list" %}' class='hover:text-gray-300 transition-colors duration-200'>
+                    Contents
+                </a>
+            </li>
+            <li aria-hidden='true'><span class='text-gray-700'>/</span></li>
+            <li class='text-gray-300 font-medium truncate max-w-xs' aria-current='page'>{{ content.title }}</li>
+        </ol>
+    </nav>
+
     {# Back link #}
     <a href='{% url "contents:list" %}'
         class='inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200 mb-6'>
@@ -39,11 +52,11 @@
 
                 {# Status badge #}
                 {% if content.status == 'new' %}
-                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20'>New</span>
+                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20'>New</span>
                 {% elif content.status == 'in_progress' %}
-                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'>In Progress</span>
+                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20'>In Progress</span>
                 {% else %}
-                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-green-500/10 text-green-400 border border-green-500/20'>Completed</span>
+                <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'>Completed</span>
                 {% endif %}
             </div>
 
@@ -148,8 +161,8 @@
             <input type='hidden' name='status' value='new'>
             <button type='submit'
                 class='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-                    bg-blue-500/10 text-blue-400 border border-blue-500/20
-                    hover:bg-blue-500/20 transition-all duration-200'>
+                    bg-sky-500/10 text-sky-400 border border-sky-500/20
+                    hover:bg-sky-500/20 transition-all duration-200'>
                 Mark as New
             </button>
         </form>
@@ -161,8 +174,8 @@
             <input type='hidden' name='status' value='in_progress'>
             <button type='submit'
                 class='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-                    bg-yellow-500/10 text-yellow-400 border border-yellow-500/20
-                    hover:bg-yellow-500/20 transition-all duration-200'>
+                    bg-amber-500/10 text-amber-400 border border-amber-500/20
+                    hover:bg-amber-500/20 transition-all duration-200'>
                 Mark as In Progress
             </button>
         </form>
@@ -174,8 +187,8 @@
             <input type='hidden' name='status' value='completed'>
             <button type='submit'
                 class='inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium
-                    bg-green-500/10 text-green-400 border border-green-500/20
-                    hover:bg-green-500/20 transition-all duration-200'>
+                    bg-emerald-500/10 text-emerald-400 border border-emerald-500/20
+                    hover:bg-emerald-500/20 transition-all duration-200'>
                 <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                     <polyline points='20 6 9 17 4 12'/>
                 </svg>
