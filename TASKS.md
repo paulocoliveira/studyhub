@@ -54,44 +54,44 @@
 
 > **Goal:** Build the Categories and Tags apps with full CRUD and user-scoped data.
 
-- [ ] **2.1 — Create Categories App**
+- [X] **2.1 — Create Categories App**
   - [X] 2.1.1 — Create the `categories` app: `python manage.py startapp categories`
-  - [ ] 2.1.2 — Define `Category` model in `categories/models.py`: fields `name` (CharField, max_length=100), `description` (TextField, blank=True), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `created_at`, `updated_at`. Add `Meta` with `unique_together = ['name', 'user']` and `ordering = ['name']`
-  - [ ] 2.1.3 — Register `Category` in `categories/admin.py`
-  - [ ] 2.1.4 — Create and run migrations for the `categories` app
+  - [X] 2.1.2 — Define `Category` model in `categories/models.py`: fields `name` (CharField, max_length=100), `description` (TextField, blank=True), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `created_at`, `updated_at`. Add `Meta` with `unique_together = ['name', 'user']` and `ordering = ['name']`
+  - [X] 2.1.3 — Register `Category` in `categories/admin.py`
+  - [X] 2.1.4 — Create and run migrations for the `categories` app
 
-- [ ] **2.2 — Build Category Views**
-  - [ ] 2.2.1 — Create `categories/forms.py` with `CategoryForm` (ModelForm, fields: name, description)
-  - [ ] 2.2.2 — Create `CategoryListView` in `categories/views.py`: CBV using `ListView`, filtered by `request.user`, annotated with content count, `LoginRequiredMixin`
-  - [ ] 2.2.3 — Create `CategoryCreateView` in `categories/views.py`: CBV using `CreateView`, auto-assign `user` in `form_valid`, `LoginRequiredMixin`
-  - [ ] 2.2.4 — Create `CategoryUpdateView` in `categories/views.py`: CBV using `UpdateView`, restrict queryset to user's categories, `LoginRequiredMixin`
-  - [ ] 2.2.5 — Create `CategoryDeleteView` in `categories/views.py`: CBV using `DeleteView`, restrict queryset to user's categories, `LoginRequiredMixin`
-  - [ ] 2.2.6 — Configure `categories/urls.py` with URL patterns: list (`''`), create (`'create/'`), update (`'<int:pk>/edit/'`), delete (`'<int:pk>/delete/'`)
-  - [ ] 2.2.7 — Include `categories.urls` in `core/urls.py` under `categories/` prefix
+- [X] **2.2 — Build Category Views**
+  - [X] 2.2.1 — Create `categories/forms.py` with `CategoryForm` (ModelForm, fields: name, description)
+  - [X] 2.2.2 — Create `CategoryListView` in `categories/views.py`: CBV using `ListView`, filtered by `request.user`, annotated with content count, `LoginRequiredMixin`
+  - [X] 2.2.3 — Create `CategoryCreateView` in `categories/views.py`: CBV using `CreateView`, auto-assign `user` in `form_valid`, `LoginRequiredMixin`
+  - [X] 2.2.4 — Create `CategoryUpdateView` in `categories/views.py`: CBV using `UpdateView`, restrict queryset to user's categories, `LoginRequiredMixin`
+  - [X] 2.2.5 — Create `CategoryDeleteView` in `categories/views.py`: CBV using `DeleteView`, restrict queryset to user's categories, `LoginRequiredMixin`
+  - [X] 2.2.6 — Configure `categories/urls.py` with URL patterns: list (`''`), create (`'create/'`), update (`'<int:pk>/edit/'`), delete (`'<int:pk>/delete/'`)
+  - [X] 2.2.7 — Include `categories.urls` in `core/urls.py` under `categories/` prefix
 
-- [ ] **2.3 — Build Category Templates**
-  - [ ] 2.3.1 — Create `templates/categories/category_list.html`: list page extending `base.html`, shows categories in card grid with name, description, content count, edit/delete action buttons
-  - [ ] 2.3.2 — Create `templates/categories/category_form.html`: create/edit form page extending `base.html`, reusable for both create and update
-  - [ ] 2.3.3 — Create `templates/categories/category_confirm_delete.html`: delete confirmation page extending `base.html`
+- [X] **2.3 — Build Category Templates**
+  - [X] 2.3.1 — Create `templates/categories/category_list.html`: list page extending `base.html`, shows categories in card grid with name, description, content count, edit/delete action buttons
+  - [X] 2.3.2 — Create `templates/categories/category_form.html`: create/edit form page extending `base.html`, reusable for both create and update
+  - [X] 2.3.3 — Create `templates/categories/category_confirm_delete.html`: delete confirmation page extending `base.html`
 
-- [ ] **2.4 — Create Tags App**
-  - [ ] 2.4.1 — Create the `tags` app: `python manage.py startapp tags`
-  - [ ] 2.4.2 — Define `Tag` model in `tags/models.py`: fields `name` (CharField, max_length=50), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `created_at`, `updated_at`. Add `Meta` with `unique_together = ['name', 'user']` and `ordering = ['name']`
-  - [ ] 2.4.3 — Register `Tag` in `tags/admin.py`
-  - [ ] 2.4.4 — Create and run migrations for the `tags` app
+- [X] **2.4 — Create Tags App**
+  - [X] 2.4.1 — Create the `tags` app: `python manage.py startapp tags`
+  - [X] 2.4.2 — Define `Tag` model in `tags/models.py`: fields `name` (CharField, max_length=50), `user` (ForeignKey to `settings.AUTH_USER_MODEL`), `created_at`, `updated_at`. Add `Meta` with `unique_together = ['name', 'user']` and `ordering = ['name']`
+  - [X] 2.4.3 — Register `Tag` in `tags/admin.py`
+  - [X] 2.4.4 — Create and run migrations for the `tags` app
 
-- [ ] **2.5 — Build Tag Views**
-  - [ ] 2.5.1 — Create `tags/forms.py` with `TagForm` (ModelForm, fields: name)
-  - [ ] 2.5.2 — Create `TagListView` in `tags/views.py`: CBV using `ListView`, filtered by `request.user`, annotated with content count, `LoginRequiredMixin`
-  - [ ] 2.5.3 — Create `TagCreateView` in `tags/views.py`: CBV using `CreateView`, auto-assign `user` in `form_valid`, `LoginRequiredMixin`
-  - [ ] 2.5.4 — Create `TagDeleteView` in `tags/views.py`: CBV using `DeleteView`, restrict queryset to user's tags, `LoginRequiredMixin`
-  - [ ] 2.5.5 — Configure `tags/urls.py` with URL patterns: list (`''`), create (`'create/'`), delete (`'<int:pk>/delete/'`)
-  - [ ] 2.5.6 — Include `tags.urls` in `core/urls.py` under `tags/` prefix
+- [X] **2.5 — Build Tag Views**
+  - [X] 2.5.1 — Create `tags/forms.py` with `TagForm` (ModelForm, fields: name)
+  - [X] 2.5.2 — Create `TagListView` in `tags/views.py`: CBV using `ListView`, filtered by `request.user`, annotated with content count, `LoginRequiredMixin`
+  - [X] 2.5.3 — Create `TagCreateView` in `tags/views.py`: CBV using `CreateView`, auto-assign `user` in `form_valid`, `LoginRequiredMixin`
+  - [X] 2.5.4 — Create `TagDeleteView` in `tags/views.py`: CBV using `DeleteView`, restrict queryset to user's tags, `LoginRequiredMixin`
+  - [X] 2.5.5 — Configure `tags/urls.py` with URL patterns: list (`''`), create (`'create/'`), delete (`'<int:pk>/delete/'`)
+  - [X] 2.5.6 — Include `tags.urls` in `core/urls.py` under `tags/` prefix
 
-- [ ] **2.6 — Build Tag Templates**
-  - [ ] 2.6.1 — Create `templates/tags/tag_list.html`: list page extending `base.html`, shows tags in a compact grid/list with name, content count, and delete action
-  - [ ] 2.6.2 — Create `templates/tags/tag_form.html`: create form page extending `base.html`
-  - [ ] 2.6.3 — Create `templates/tags/tag_confirm_delete.html`: delete confirmation page extending `base.html`
+- [X] **2.6 — Build Tag Templates**
+  - [X] 2.6.1 — Create `templates/tags/tag_list.html`: list page extending `base.html`, shows tags in a compact grid/list with name, content count, and delete action
+  - [X] 2.6.2 — Create `templates/tags/tag_form.html`: create form page extending `base.html`
+  - [X] 2.6.3 — Create `templates/tags/tag_confirm_delete.html`: delete confirmation page extending `base.html`
 
 ---
 
