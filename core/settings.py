@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'contents',
     'categories',
     'tags',
-    'insights',
-    'dashboard',
+    'insights'
 ]
 
 MIDDLEWARE = [
