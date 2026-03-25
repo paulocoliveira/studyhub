@@ -1,0 +1,95 @@
+{# AI Insights panel — intended to be {% include %}'d, not extended #}
+<div id='insights-panel' class='bg-gray-900 border border-gray-800 rounded-xl p-5'>
+
+    <div class='flex items-center justify-between mb-4'>
+        <div class='flex items-center gap-2'>
+            <div class='w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-white' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                    <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
+                </svg>
+            </div>
+            <h2 class='text-lg font-semibold text-white'>AI Insights</h2>
+        </div>
+        <button id='btn-generate-insights'
+            type='button'
+            data-url='{% url "insights:generate_insights" %}'
+            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
+            ✨ Generate Insights
+        </button>
+    </div>
+
+    <div id='insights-result' class='hidden'>
+        {# Result is injected here by JS as rendered HTML #}
+    </div>
+
+    <div id='insights-placeholder' class='text-sm text-gray-500 text-center py-4'>
+        Click "Generate Insights" to get an AI analysis of your learning habits.
+    </div>
+
+    <div id='insights-error' class='hidden text-sm text-red-400 mt-2'></div>
+
+</div>
+
+<script>
+    // Simple markdown-to-HTML converter (bold, bullet lists, paragraphs, line breaks)
+    function simpleMarkdown(text) {
+        return text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/^## (.+)$/gm, '<h3 class="text-sm font-semibold text-gray-200 mt-4 mb-1">$1</h3>')
+            .replace(/^# (.+)$/gm, '<h2 class="text-base font-semibold text-gray-100 mt-4 mb-1">$1</h2>')
+            .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc text-gray-300">$1</li>')
+            .replace(/\n\n/g, '</p><p class="mt-2">')
+            .replace(/\n/g, '<br>');
+    }
+
+    (function() {
+        var btn = document.getElementById('btn-generate-insights');
+        if (!btn) return;
+
+        btn.addEventListener('click', function() {
+            var self = this;
+            self.disabled = true;
+            var orig = self.innerHTML;
+            self.innerHTML = '<svg class="animate-spin h-3 w-3 inline mr-1" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Generating...';
+
+            var resultEl = document.getElementById('insights-result');
+            var placeholderEl = document.getElementById('insights-placeholder');
+            var errorEl = document.getElementById('insights-error');
+            var url = self.dataset.url;
+
+            // Extract CSRF token from cookie
+            var csrfToken = '';
+            if (document.cookie) {
+                var match = document.cookie.match(/csrftoken=([^;]+)/);
+                if (match) csrfToken = decodeURIComponent(match[1]);
+            }
+
+            fetch(url, {
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json',
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    resultEl.innerHTML = '<div class="text-sm text-gray-300 leading-relaxed"><p>' + simpleMarkdown(data.insights) + '</p></div>';
+                    resultEl.classList.remove('hidden');
+                    placeholderEl.classList.add('hidden');
+                    errorEl.classList.add('hidden');
+                } else {
+                    errorEl.textContent = data.error || 'Failed to generate insights.';
+                    errorEl.classList.remove('hidden');
+                }
+            })
+            .catch(function() {
+                errorEl.textContent = 'Connection error. Please try again.';
+                errorEl.classList.remove('hidden');
+            })
+            .finally(function() {
+                self.disabled = false;
+                self.innerHTML = orig;
+            });
+        });
+    })();
+</script>

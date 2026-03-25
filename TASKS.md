@@ -167,38 +167,38 @@
 
 > **Goal:** Integrate AI features for category suggestion, description generation, and consumption insights.
 
-- [ ] **5.1 — Create Insights App**
+- [X] **5.1 — Create Insights App**
   - [X] 5.1.1 — Create the `insights` app: `python manage.py startapp insights`
-  - [ ] 5.1.2 — Install the `anthropic` Python SDK: add to `requirements.txt`
-  - [ ] 5.1.3 — Add `ANTHROPIC_API_KEY` setting in `core/settings.py` (read from environment variable)
-  - [ ] 5.1.4 — Register the `insights` app in `INSTALLED_APPS`
+  - [X] 5.1.2 — Install the `anthropic` Python SDK: add to `requirements.txt`
+  - [X] 5.1.3 — Add `ANTHROPIC_API_KEY` setting in `core/settings.py` (read from environment variable)
+  - [X] 5.1.4 — Register the `insights` app in `INSTALLED_APPS`
 
-- [ ] **5.2 — Build AI Service Layer**
-  - [ ] 5.2.1 — Create `insights/services.py` with an `AIService` class containing:
+- [X] **5.2 — Build AI Service Layer**
+  - [X] 5.2.1 — Create `insights/services.py` with an `AIService` class containing:
     - `suggest_category(title, url, user_categories)`: sends a prompt to Claude API asking for the best category from the user's existing categories (returns category name string)
     - `generate_description(title, url, content_type)`: sends a prompt to Claude API asking for a short description of the content (returns description string)
     - `generate_insights(user_stats)`: sends a prompt to Claude API with the user's content statistics and asks for a brief analysis of their consumption habits and suggestions (returns markdown/text string)
-  - [ ] 5.2.2 — Implement proper error handling in `AIService`: catch API errors, timeouts, and return `None` or a user-friendly error message
-  - [ ] 5.2.3 — Implement rate limiting logic: simple in-memory or session-based check to prevent excessive API calls per user per day
+  - [X] 5.2.2 — Implement proper error handling in `AIService`: catch API errors, timeouts, and return `None` or a user-friendly error message
+  - [X] 5.2.3 — Implement rate limiting logic: simple in-memory or session-based check to prevent excessive API calls per user per day
 
-- [ ] **5.3 — Build AI API Views**
-  - [ ] 5.3.1 — Create `SuggestCategoryView` in `insights/views.py`: accepts POST with `title` and `url`, calls `AIService.suggest_category`, returns JSON response. `LoginRequiredMixin`
-  - [ ] 5.3.2 — Create `GenerateDescriptionView` in `insights/views.py`: accepts POST with `title`, `url`, and `content_type`, calls `AIService.generate_description`, returns JSON response. `LoginRequiredMixin`
-  - [ ] 5.3.3 — Create `GenerateInsightsView` in `insights/views.py`: accepts GET, gathers user stats via `DashboardService`, calls `AIService.generate_insights`, returns rendered HTML or JSON. `LoginRequiredMixin`
-  - [ ] 5.3.4 — Configure `insights/urls.py` with URL patterns: `suggest-category/`, `generate-description/`, `generate-insights/`
-  - [ ] 5.3.5 — Include `insights.urls` in `core/urls.py` under `insights/` prefix
+- [X] **5.3 — Build AI API Views**
+  - [X] 5.3.1 — Create `SuggestCategoryView` in `insights/views.py`: accepts POST with `title` and `url`, calls `AIService.suggest_category`, returns JSON response. `LoginRequiredMixin`
+  - [X] 5.3.2 — Create `GenerateDescriptionView` in `insights/views.py`: accepts POST with `title`, `url`, and `content_type`, calls `AIService.generate_description`, returns JSON response. `LoginRequiredMixin`
+  - [X] 5.3.3 — Create `GenerateInsightsView` in `insights/views.py`: accepts GET, gathers user stats via `DashboardService`, calls `AIService.generate_insights`, returns rendered HTML or JSON. `LoginRequiredMixin`
+  - [X] 5.3.4 — Configure `insights/urls.py` with URL patterns: `suggest-category/`, `generate-description/`, `generate-insights/`
+  - [X] 5.3.5 — Include `insights.urls` in `core/urls.py` under `insights/` prefix
 
-- [ ] **5.4 — Integrate AI into Content Form**
-  - [ ] 5.4.1 — Add JavaScript to `templates/contents/content_form.html`: an "AI Suggest Category" button that sends an AJAX POST to `suggest-category/` endpoint with the current title and URL fields, and populates the category dropdown on success
-  - [ ] 5.4.2 — Add JavaScript to `templates/contents/content_form.html`: an "AI Generate Description" button that sends an AJAX POST to `generate-description/` endpoint with current title, URL, and content_type fields, and populates the description textarea on success
-  - [ ] 5.4.3 — Style the AI buttons distinctively (e.g., small gradient buttons with a sparkle/AI icon) so they are clearly identified as AI features
-  - [ ] 5.4.4 — Add loading states (spinner/disabled button) while AI requests are in progress
-  - [ ] 5.4.5 — Add error handling UI: show a toast or inline message if the AI call fails
+- [X] **5.4 — Integrate AI into Content Form**
+  - [X] 5.4.1 — Add JavaScript to `templates/contents/content_form.html`: an "AI Suggest Category" button that sends an AJAX POST to `suggest-category/` endpoint with the current title and URL fields, and populates the category dropdown on success
+  - [X] 5.4.2 — Add JavaScript to `templates/contents/content_form.html`: an "AI Generate Description" button that sends an AJAX POST to `generate-description/` endpoint with current title, URL, and content_type fields, and populates the description textarea on success
+  - [X] 5.4.3 — Style the AI buttons distinctively (e.g., small gradient buttons with a sparkle/AI icon) so they are clearly identified as AI features
+  - [X] 5.4.4 — Add loading states (spinner/disabled button) while AI requests are in progress
+  - [X] 5.4.5 — Add error handling UI: show a toast or inline message if the AI call fails
 
-- [ ] **5.5 — Build Insights Dashboard Section**
-  - [ ] 5.5.1 — Create `templates/insights/insights_panel.html`: a panel/card that can be included in the dashboard or shown as a standalone page. Contains a "Generate Insights" button and an area to display the AI-generated text
-  - [ ] 5.5.2 — Add JavaScript to the insights panel: clicking the button sends AJAX GET to `generate-insights/`, displays the result in the panel with loading state
-  - [ ] 5.5.3 — Integrate the insights panel into the dashboard template (add as a new row or section at the bottom of the dashboard)
+- [X] **5.5 — Build Insights Dashboard Section**
+  - [X] 5.5.1 — Create `templates/insights/insights_panel.html`: a panel/card that can be included in the dashboard or shown as a standalone page. Contains a "Generate Insights" button and an area to display the AI-generated text
+  - [X] 5.5.2 — Add JavaScript to the insights panel: clicking the button sends AJAX GET to `generate-insights/`, displays the result in the panel with loading state
+  - [X] 5.5.3 — Integrate the insights panel into the dashboard template (add as a new row or section at the bottom of the dashboard)
 
 ---
 
