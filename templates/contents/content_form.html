@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit Content{% else %}New Content{% endif %} — StudyHub{% endblock %}
+
+{% block content %}
+<div class='max-w-2xl mx-auto'>
+
+    {# Back link #}
+    <a href='{% url "contents:list" %}'
+        class='inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200 mb-6'>
+        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+            <polyline points='15 18 9 12 15 6'/>
+        </svg>
+        Back to Contents
+    </a>
+
+    {# Form card #}
+    <div class='bg-gray-900 border border-gray-800 rounded-2xl p-8'>
+
+        {# Title #}
+        <h1 class='text-2xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent mb-6'>
+            {% if form.instance.pk %}Edit Content{% else %}New Content{% endif %}
+        </h1>
+
+        <form method='POST' novalidate>
+            {% csrf_token %}
+
+            {# Non-field errors #}
+            {% if form.non_field_errors %}
+            <div class='mb-5 p-4 bg-red-500/10 border border-red-500/20 rounded-lg'>
+                {% for error in form.non_field_errors %}
+                <p class='text-sm text-red-400'>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class='flex flex-col gap-5'>
+
+                {# Title #}
+                <div>
+                    <label for='{{ form.title.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                        Title <span class='text-rose-400'>*</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    {% for error in form.title.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# URL #}
+                <div>
+                    <label for='{{ form.url.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                        URL
+                    </label>
+                    {{ form.url }}
+                    <p class='mt-1 text-xs text-gray-600'>Optional — paste a link to an article, video, etc.</p>
+                    {% if form.url.errors %}
+                    {% for error in form.url.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Content type + Status (side by side on md+) #}
+                <div class='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div>
+                        <label for='{{ form.content_type.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                            Type <span class='text-rose-400'>*</span>
+                        </label>
+                        {{ form.content_type }}
+                        {% if form.content_type.errors %}
+                        {% for error in form.content_type.errors %}
+                        <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label for='{{ form.status.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                            Status
+                        </label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                        {% for error in form.status.errors %}
+                        <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Category #}
+                <div>
+                    <label for='{{ form.category.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                        Category
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    {% for error in form.category.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Description #}
+                <div>
+                    <label for='{{ form.description.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1.5'>
+                        Description
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    {% for error in form.description.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Tags #}
+                <div>
+                    <label class='block text-sm font-medium text-gray-400 mb-2'>Tags</label>
+                    {% if form.tags.field.queryset.exists %}
+                    <div class='flex flex-wrap gap-2 p-3 bg-gray-800 border border-gray-700 rounded-lg'>
+                        {% for checkbox in form.tags %}
+                        <label class='inline-flex items-center gap-2 cursor-pointer group'>
+                            {{ checkbox.tag }}
+                            <span class='px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-200
+                                bg-gray-700 text-gray-400 border-gray-600
+                                group-has-[:checked]:bg-violet-500/20 group-has-[:checked]:text-violet-400 group-has-[:checked]:border-violet-500/40'>
+                                {{ checkbox.choice_label }}
+                            </span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class='text-sm text-gray-600 italic p-3 bg-gray-800 border border-gray-700 rounded-lg'>
+                        No tags yet.
+                        <a href='{% url "tags:create" %}' class='text-violet-400 hover:text-violet-300'>Create your first tag</a>
+                    </p>
+                    {% endif %}
+                    {% if form.tags.errors %}
+                    {% for error in form.tags.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# AI placeholder (Sprint 5) #}
+                <div class='border border-dashed border-gray-700 rounded-xl p-5'>
+                    <div class='flex items-center gap-2 mb-3'>
+                        <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-gray-600' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                            <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
+                        </svg>
+                        <p class='text-xs font-medium text-gray-600 uppercase tracking-wider'>AI Features — Sprint 5</p>
+                    </div>
+                    <div class='flex flex-wrap gap-2'>
+                        <button type='button' disabled
+                            class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                                bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed opacity-60'>
+                            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                                <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
+                            </svg>
+                            AI Suggest Category
+                        </button>
+                        <button type='button' disabled
+                            class='inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+                                bg-gray-800 text-gray-600 border border-gray-700 cursor-not-allowed opacity-60'>
+                            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                                <polygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/>
+                            </svg>
+                            AI Generate Description
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            {# Form actions #}
+            <div class='flex items-center gap-3 mt-8 pt-6 border-t border-gray-800'>
+                <button type='submit'
+                    class='inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600
+                        text-white text-sm font-medium rounded-lg
+                        hover:from-violet-500 hover:to-indigo-500
+                        transition-all duration-200 shadow-lg shadow-violet-500/25'>
+                    <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                        <polyline points='20 6 9 17 4 12'/>
+                    </svg>
+                    Save Content
+                </button>
+                <a href='{% url "contents:list" %}'
+                    class='text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200'>
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}
