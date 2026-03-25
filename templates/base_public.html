@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang='en' class='h-full'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>{% block title %}StudyHub{% endblock %}</title>
+
+    <!-- Inter font -->
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
+    <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' rel='stylesheet'>
+
+    <!-- TailwindCSS CDN -->
+    <script src='https://cdn.tailwindcss.com'></script>
+
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class='min-h-full bg-gray-950 text-gray-100 antialiased'>
+
+    {% if messages %}
+    <div class='fixed top-4 right-4 z-50 flex flex-col gap-2 w-full max-w-sm'>
+        {% for message in messages %}
+        <div role='alert'
+            class='flex items-start gap-3 px-4 py-3 rounded-lg border text-sm
+            {% if message.tags == "success" %}bg-emerald-500/10 border-emerald-500/20 text-emerald-400
+            {% elif message.tags == "error" %}bg-rose-500/10 border-rose-500/20 text-rose-400
+            {% elif message.tags == "warning" %}bg-amber-500/10 border-amber-500/20 text-amber-400
+            {% else %}bg-sky-500/10 border-sky-500/20 text-sky-400{% endif %}'>
+            <span class='flex-1'>{{ message }}</span>
+            <button type='button'
+                onclick='this.closest("[role=alert]").remove()'
+                class='shrink-0 text-current opacity-60 hover:opacity-100 transition-opacity'
+                aria-label='Dismiss'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 20 20' fill='currentColor' aria-hidden='true'>
+                    <path fill-rule='evenodd' d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z' clip-rule='evenodd'/>
+                </svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

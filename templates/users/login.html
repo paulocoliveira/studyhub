@@ -1,0 +1,124 @@
+{% extends 'base_public.html' %}
+
+{% block title %}Log In — StudyHub{% endblock %}
+
+{% block content %}
+<div class='min-h-screen flex flex-col items-center justify-center px-4 py-12'>
+
+    <!-- Brand mark -->
+    <div class='flex items-center gap-2.5 mb-8'>
+        <div class='w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center'>
+            <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-white' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M12 2L2 7l10 5 10-5-10-5z'/>
+                <path d='M2 17l10 5 10-5'/>
+                <path d='M2 12l10 5 10-5'/>
+            </svg>
+        </div>
+        <span class='text-xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent'>
+            StudyHub
+        </span>
+    </div>
+
+    <!-- Card -->
+    <div class='w-full max-w-md bg-gray-900 border border-gray-800 rounded-2xl p-8'>
+
+        <!-- Heading -->
+        <div class='mb-8 text-center'>
+            <h1 class='text-2xl font-bold bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent mb-1'>
+                Welcome back
+            </h1>
+            <p class='text-sm text-gray-400'>Sign in to continue to StudyHub</p>
+        </div>
+
+        <!-- Non-field errors (invalid credentials etc.) -->
+        {% if form.non_field_errors %}
+        <div class='mb-6 px-4 py-3 rounded-lg bg-rose-500/10 border border-rose-500/20' role='alert'>
+            {% for error in form.non_field_errors %}
+            <p class='text-sm text-rose-400'>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Login form -->
+        <form method='POST' action='{% url "users:login" %}' novalidate>
+            {% csrf_token %}
+
+            {% if next %}
+            <input type='hidden' name='next' value='{{ next }}'>
+            {% endif %}
+
+            <div class='flex flex-col gap-5'>
+
+                <!-- Email -->
+                <div>
+                    <label for='{{ form.username.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1'>
+                        Email address
+                    </label>
+                    <input type='email'
+                        name='{{ form.username.html_name }}'
+                        id='{{ form.username.id_for_label }}'
+                        value='{{ form.username.value|default:"" }}'
+                        autocomplete='email'
+                        autofocus
+                        class='w-full px-3 py-2.5 bg-gray-800 border rounded-lg
+                        text-gray-100 text-sm placeholder-gray-500
+                        focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500
+                        transition-all duration-200
+                        {% if form.username.errors %}border-rose-500{% else %}border-gray-700{% endif %}'
+                        placeholder='jane@example.com'>
+                    {% for error in form.username.errors %}
+                    <p class='mt-1 text-xs text-rose-500' role='alert'>{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <div class='flex items-center justify-between mb-1'>
+                        <label for='{{ form.password.id_for_label }}' class='text-sm font-medium text-gray-400'>
+                            Password
+                        </label>
+                        <!-- Forgot password placeholder link -->
+                        <span class='text-xs text-gray-600 cursor-not-allowed' title='Coming soon'>
+                            Forgot password?
+                        </span>
+                    </div>
+                    <input type='password'
+                        name='{{ form.password.html_name }}'
+                        id='{{ form.password.id_for_label }}'
+                        autocomplete='current-password'
+                        class='w-full px-3 py-2.5 bg-gray-800 border rounded-lg
+                        text-gray-100 text-sm placeholder-gray-500
+                        focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500
+                        transition-all duration-200
+                        {% if form.password.errors %}border-rose-500{% else %}border-gray-700{% endif %}'
+                        placeholder='••••••••'>
+                    {% for error in form.password.errors %}
+                    <p class='mt-1 text-xs text-rose-500' role='alert'>{{ error }}</p>
+                    {% endfor %}
+                </div>
+
+                <!-- Submit -->
+                <button type='submit'
+                    class='w-full py-3 px-4 bg-gradient-to-r from-violet-600 to-indigo-600
+                    text-white text-sm font-semibold rounded-lg
+                    hover:from-violet-500 hover:to-indigo-500
+                    focus:outline-none focus:ring-2 focus:ring-violet-500/50
+                    transition-all duration-200 shadow-lg shadow-violet-500/25
+                    mt-1'>
+                    Sign in
+                </button>
+
+            </div>
+        </form>
+
+        <!-- Link to register -->
+        <p class='mt-6 text-center text-sm text-gray-500'>
+            Don't have an account?
+            <a href='{% url "users:register" %}' class='text-violet-400 hover:text-violet-300 font-medium transition-colors duration-200'>
+                Sign up free
+            </a>
+        </p>
+
+    </div>
+</div>
+{% endblock %}
