@@ -4,6 +4,17 @@ from .models import Category
 
 
 class CategoryForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._user = user
+
+    def validate_unique(self):
+        # user is injected here so unique_together ['name', 'user'] validates
+        # correctly at form validation time, before form_valid sets the instance user.
+        if self._user is not None:
+            self.instance.user = self._user
+        super().validate_unique()
+
     class Meta:
         model = Category
         fields = ['name', 'description']

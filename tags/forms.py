@@ -4,6 +4,15 @@ from .models import Tag
 
 
 class TagForm(forms.ModelForm):
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._user = user
+
+    def validate_unique(self):
+        if self._user is not None:
+            self.instance.user = self._user
+        super().validate_unique()
+
     class Meta:
         model = Tag
         fields = ['name']
