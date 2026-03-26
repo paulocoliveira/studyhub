@@ -134,3 +134,79 @@ class UserSettingsTest(TestCase):
         self.assertRedirects(response, reverse('users:settings'))
         self.user.refresh_from_db()
         self.assertEqual(self.user.ai_api_key, 'sk-existing-key')
+
+
+# ---------------------------------------------------------------------------
+# Bug verification tests — PASS when bug is present, FAIL when bug is fixed
+# ---------------------------------------------------------------------------
+
+
+class BugVerificationTests(TestCase):
+    # ------------------------------------------------------------------
+    # Bug 10.1.1 — Short password accepted (MinimumLengthValidator absent)
+    # ------------------------------------------------------------------
+    def test_bug_10_1_1_short_password_accepted(self):
+        # A 2-character password should fail validation but the
+        # MinimumLengthValidator is missing from AUTH_PASSWORD_VALIDATORS,
+        # so registration succeeds and returns a redirect (302).
+        response = self.client.post(
+            reverse('users:register'),
+            {
+                'email': 'shortpass@example.com',
+                'first_name': 'Test',
+                'last_name': 'User',
+                'password1': 'ab',
+                'password2': 'ab',
+            },
+        )
+        # Bug present: registration succeeds with a weak password → redirect
+        self.assertEqual(response.status_code, 302)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.2 — Login reveals whether an email account exists
+    # ------------------------------------------------------------------
+    def test_bug_10_1_2_login_reveals_email_existence(self):
+        User.objects.create_user(email='existing@test.com', password='ValidPass123!')
+
+        # Wrong password for a real account
+        response_existing = self.client.post(
+            reverse('users:login'),
+            {'username': 'existing@test.com', 'password': 'wrongpassword'},
+        )
+        content_existing = response_existing.content.decode()
+
+        # Wrong password for a non-existent account
+        response_missing = self.client.post(
+            reverse('users:login'),
+            {'username': 'notexisting@test.com', 'password': 'wrongpassword'},
+        )
+        content_missing = response_missing.content.decode()
+
+        # Bug present: each branch emits a distinct message leaking account existence
+        self.assertIn('incorrect', content_existing.lower())
+        self.assertIn('found', content_missing.lower())
+        self.assertNotEqual(content_existing, content_missing)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.3 — Password change invalidates session (missing update_session_auth_hash)
+    # ------------------------------------------------------------------
+    def test_bug_10_1_3_password_change_invalidates_session(self):
+        user = User.objects.create_user(
+            email='changepass@example.com', password='OldPassword123!'
+        )
+        self.client.force_login(user)
+
+        self.client.post(
+            reverse('users:password_change'),
+            {
+                'old_password': 'OldPassword123!',
+                'new_password1': 'NewPassword456!',
+                'new_password2': 'NewPassword456!',
+            },
+        )
+
+        # Bug present: session is invalidated because update_session_auth_hash
+        # was not called, so the protected page redirects to login (302).
+        response = self.client.get(reverse('dashboard:home'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response['Location'])

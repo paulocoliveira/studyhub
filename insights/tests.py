@@ -421,3 +421,46 @@ class BuildUserContextTest(TestCase):
         )
         context = build_user_context(self.user)
         self.assertIn('Total items: 2', context)
+
+
+# ---------------------------------------------------------------------------
+# Bug verification tests — PASS when bug is present, FAIL when bug is fixed
+# ---------------------------------------------------------------------------
+
+
+class BugVerificationTests(TestCase):
+    # ------------------------------------------------------------------
+    # Bug 10.1.19 — suggest_category passes all users' categories to AI
+    # ------------------------------------------------------------------
+    def test_bug_10_1_19_suggest_category_uses_all_categories(self):
+        user1 = User.objects.create_user(
+            email='user1@insightbug.com', password='TestPass123!'
+        )
+        user2 = User.objects.create_user(
+            email='user2@insightbug.com', password='TestPass123!'
+        )
+
+        Category.objects.create(name='AI', user=user1)
+        Category.objects.create(name='DevOps', user=user2)
+
+        self.client.force_login(user1)
+
+        with patch('insights.views.AIService') as MockAIService:
+            instance = MockAIService.return_value
+            instance.suggest_category.return_value = 'AI'
+
+            _json_post(
+                self.client,
+                reverse('insights:suggest_category'),
+                {'title': 'Kubernetes intro'},
+            )
+
+            self.assertTrue(instance.suggest_category.called)
+            call_args = instance.suggest_category.call_args
+            # The third positional argument is the list of category names
+            category_names_passed = call_args[0][2]
+
+            # Bug present: category_names_passed contains user2's 'DevOps' category
+            # because the view uses Category.objects.all() instead of
+            # Category.objects.filter(user=request.user)
+            self.assertIn('DevOps', category_names_passed)

@@ -18,6 +18,14 @@ SELECT_CLASS = (
 
 
 class ContentForm(forms.ModelForm):
+    title = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': INPUT_CLASS,
+            'placeholder': 'Content title',
+        }),
+    )
+
     class Meta:
         model = Content
         fields = [

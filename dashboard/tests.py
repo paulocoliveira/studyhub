@@ -156,3 +156,42 @@ class DashboardRecentListsTest(TestCase):
         recent_completed = list(self.service.get_recent_completed())
         # Most recently updated completed item should be first
         self.assertEqual(recent_completed[0].title, 'Another Completed')
+
+
+# ---------------------------------------------------------------------------
+# Bug verification tests — PASS when bug is present, FAIL when bug is fixed
+# ---------------------------------------------------------------------------
+
+
+class BugVerificationTests(TestCase):
+    # ------------------------------------------------------------------
+    # Bug 10.1.15 — total_contents includes all users' content
+    # ------------------------------------------------------------------
+    def test_bug_10_1_15_total_count_includes_all_users(self):
+        user1 = User.objects.create_user(
+            email='user1@bugtest.com', password='TestPass123!'
+        )
+        user2 = User.objects.create_user(
+            email='user2@bugtest.com', password='TestPass123!'
+        )
+
+        for i in range(3):
+            Content.objects.create(
+                user=user1,
+                title=f'User1 Content {i}',
+                content_type='article',
+                status='new',
+            )
+        for i in range(2):
+            Content.objects.create(
+                user=user2,
+                title=f'User2 Content {i}',
+                content_type='article',
+                status='new',
+            )
+
+        service = DashboardService(user=user1)
+        stats = service.get_stats()
+
+        # Bug present: total_contents is 5 (all users combined) instead of 3
+        self.assertEqual(stats['total_contents'], 5)

@@ -376,71 +376,71 @@
 
 > **Goal:** Intentionally introduce 18 bugs across the application for a QA hackathon challenge. Participants must explore and test the application to discover and document these defects. Bugs span multiple severity levels (critical, major, minor, cosmetic) and multiple domains (auth, content, categories, tags, dashboard, AI, UI/UX) to reward diverse testing strategies.
 
-- [ ] **10.1 — Inject Bugs into the Application**
+- [x] **10.1 — Inject Bugs into the Application**
 
-  - [ ] 10.1.1 — **Auth: Registration accepts passwords shorter than 8 characters.** Remove or bypass Django's `MinimumLengthValidator` in `AUTH_PASSWORD_VALIDATORS` settings so users can register with extremely short passwords like "123" without any validation error.
+  - [x] 10.1.1 — **Auth: Registration accepts passwords shorter than 8 characters.** Remove or bypass Django's `MinimumLengthValidator` in `AUTH_PASSWORD_VALIDATORS` settings so users can register with extremely short passwords like "123" without any validation error.
 
-  - [ ] 10.1.2 — **Auth: Login error message reveals whether the email exists.** Modify the `EmailAuthenticationForm` or `CustomLoginView` to show "Password is incorrect" when the email exists but the password is wrong, and "Email not found" when the email doesn't exist. This is an information disclosure vulnerability — the default Django behavior uses a generic message, so the bug is introduced by replacing it with specific messages.
+  - [x] 10.1.2 — **Auth: Login error message reveals whether the email exists.** Modify the `EmailAuthenticationForm` or `CustomLoginView` to show "Password is incorrect" when the email exists but the password is wrong, and "Email not found" when the email doesn't exist. This is an information disclosure vulnerability — the default Django behavior uses a generic message, so the bug is introduced by replacing it with specific messages.
 
-  - [ ] 10.1.3 — **Auth: After changing password, user session is not invalidated.** Modify `CustomPasswordChangeView` to skip calling `update_session_auth_hash()` after a successful password change, causing the user to be logged out unexpectedly after the redirect. The success message says "Password changed successfully" but the user is kicked to the login page.
+  - [x] 10.1.3 — **Auth: After changing password, user session is not invalidated.** Modify `CustomPasswordChangeView` to skip calling `update_session_auth_hash()` after a successful password change, causing the user to be logged out unexpectedly after the redirect. The success message says "Password changed successfully" but the user is kicked to the login page.
 
-  - [ ] 10.1.4 — **Content: Creating content without a title silently saves with an empty title.** Remove the `required` constraint from the `title` field in `ContentForm` (set `required=False` and remove model-level blank validation or use `blank=True` on the model). The form submits successfully and the content list shows an empty-titled card.
+  - [x] 10.1.4 — **Content: Creating content without a title silently saves with an empty title.** Remove the `required` constraint from the `title` field in `ContentForm` (set `required=False` and remove model-level blank validation or use `blank=True` on the model). The form submits successfully and the content list shows an empty-titled card.
 
-  - [ ] 10.1.5 — **Content: Status filter shows all content regardless of selected status.** In `ContentListView`, introduce a bug in the filter logic: when the `status` GET parameter is present, use `.exclude(status=status)` instead of `.filter(status=status)`. This inverts the results — selecting "Completed" shows everything except completed items.
+  - [x] 10.1.5 — **Content: Status filter shows all content regardless of selected status.** In `ContentListView`, introduce a bug in the filter logic: when the `status` GET parameter is present, use `.exclude(status=status)` instead of `.filter(status=status)`. This inverts the results — selecting "Completed" shows everything except completed items.
 
-  - [ ] 10.1.6 — **Content: Editing content from another user is possible via direct URL manipulation.** In `ContentUpdateView`, remove the queryset filtering by `request.user` (remove the `get_queryset` override that limits to the logged-in user's content). Any authenticated user can now edit any content by navigating directly to `/contents/<other_user_content_id>/edit/`.
+  - [x] 10.1.6 — **Content: Editing content from another user is possible via direct URL manipulation.** In `ContentUpdateView`, remove the queryset filtering by `request.user` (remove the `get_queryset` override that limits to the logged-in user's content). Any authenticated user can now edit any content by navigating directly to `/contents/<other_user_content_id>/edit/`.
 
-  - [ ] 10.1.7 — **Content: Sorting by "oldest first" still sorts by newest first.** In `ContentListView`, when the sort parameter is `oldest`, apply `.order_by('-created_at')` (descending) instead of `.order_by('created_at')` (ascending), making both "newest" and "oldest" sort options produce the same result.
+  - [x] 10.1.7 — **Content: Sorting by "oldest first" still sorts by newest first.** In `ContentListView`, when the sort parameter is `oldest`, apply `.order_by('-created_at')` (descending) instead of `.order_by('created_at')` (ascending), making both "newest" and "oldest" sort options produce the same result.
 
-  - [ ] 10.1.8 — **Content: Quick status change to "Completed" sets the status to "In Progress" instead.** In `ContentStatusUpdateView`, introduce a mapping bug: when the received status value is `completed`, save it as `in_progress` instead. The user clicks "Mark as Completed" but the badge changes to "In Progress".
+  - [x] 10.1.8 — **Content: Quick status change to "Completed" sets the status to "In Progress" instead.** In `ContentStatusUpdateView`, introduce a mapping bug: when the received status value is `completed`, save it as `in_progress` instead. The user clicks "Mark as Completed" but the badge changes to "In Progress".
 
-  - [ ] 10.1.9 — **Content: Pagination shows wrong total count on filtered results.** In `ContentListView`, compute the `total_count` context variable using the unfiltered queryset (`Content.objects.filter(user=request.user).count()`) instead of the filtered queryset's count. When filters are active, the header says "Showing 47 contents" even though only 3 are displayed on the page.
+  - [x] 10.1.9 — **Content: Pagination shows wrong total count on filtered results.** In `ContentListView`, compute the `total_count` context variable using the unfiltered queryset (`Content.objects.filter(user=request.user).count()`) instead of the filtered queryset's count. When filters are active, the header says "Showing 47 contents" even though only 3 are displayed on the page.
 
-  - [ ] 10.1.10 — **Categories: Deleting a category also deletes all content in that category.** On the `Category` model's `user` ForeignKey (or the Content model's `category` ForeignKey), change `on_delete=models.SET_NULL` to `on_delete=models.CASCADE`. When a user deletes a category, all content associated with that category is silently deleted instead of having its category set to null.
+  - [x] 10.1.10 — **Categories: Deleting a category also deletes all content in that category.** On the `Category` model's `user` ForeignKey (or the Content model's `category` ForeignKey), change `on_delete=models.SET_NULL` to `on_delete=models.CASCADE`. When a user deletes a category, all content associated with that category is silently deleted instead of having its category set to null.
 
-  - [ ] 10.1.11 — **Categories: Duplicate category names are allowed for the same user.** Remove the `unique_together = ['name', 'user']` constraint from the `Category` model's `Meta` class. Users can now create multiple categories with identical names, causing confusion in filters and dropdowns.
+  - [x] 10.1.11 — **Categories: Duplicate category names are allowed for the same user.** Remove the `unique_together = ['name', 'user']` constraint from the `Category` model's `Meta` class. Users can now create multiple categories with identical names, causing confusion in filters and dropdowns.
 
-  - [ ] 10.1.12 — **Tags: Tag content count on the tag list page always shows 0.** In `TagListView`, introduce a bug in the annotation: use `Count('id')` instead of `Count('content')` (or reference a wrong related name), so the content count annotation always returns 0 for every tag regardless of how many contents are actually tagged.
+  - [x] 10.1.12 — **Tags: Tag content count on the tag list page always shows 0.** In `TagListView`, introduce a bug in the annotation: use `Count('id')` instead of `Count('content')` (or reference a wrong related name), so the content count annotation always returns 0 for every tag regardless of how many contents are actually tagged.
 
-  - [ ] 10.1.13 — **Tags: Deleting a tag does not remove it from associated content items.** Override the `Tag.delete()` method (or the `TagDeleteView`) to call `self.content_set.clear()` **after** `super().delete()` — since the tag is already deleted, the clear does nothing and orphan references remain. Alternatively, skip the M2M cleanup entirely so the through-table retains stale entries. This manifests as ghost tag badges on content detail pages that link to a 404.
+  - [x] 10.1.13 — **Tags: Deleting a tag does not remove it from associated content items.** Override the `Tag.delete()` method (or the `TagDeleteView`) to call `self.content_set.clear()` **after** `super().delete()` — since the tag is already deleted, the clear does nothing and orphan references remain. Alternatively, skip the M2M cleanup entirely so the through-table retains stale entries. This manifests as ghost tag badges on content detail pages that link to a 404.
 
-  - [ ] 10.1.14 — **Dashboard: "Recently Completed" section shows recently added items instead.** In `DashboardService`, for the "recently completed" query, use `.order_by('-created_at')` instead of `.order_by('-updated_at')` and omit the `.filter(status='completed')`. This returns the most recently created items regardless of status, identical to the "Recently Added" section.
+  - [x] 10.1.14 — **Dashboard: "Recently Completed" section shows recently added items instead.** In `DashboardService`, for the "recently completed" query, use `.order_by('-created_at')` instead of `.order_by('-updated_at')` and omit the `.filter(status='completed')`. This returns the most recently created items regardless of status, identical to the "Recently Added" section.
 
-  - [ ] 10.1.15 — **Dashboard: Total content count includes content from all users.** In `DashboardService`, compute the total count with `Content.objects.count()` instead of `Content.objects.filter(user=user).count()`. On a multi-user instance, the total stat is inflated with other users' content while the per-status breakdown is correct (user-scoped), creating a mismatch.
+  - [x] 10.1.15 — **Dashboard: Total content count includes content from all users.** In `DashboardService`, compute the total count with `Content.objects.count()` instead of `Content.objects.filter(user=user).count()`. On a multi-user instance, the total stat is inflated with other users' content while the per-status breakdown is correct (user-scoped), creating a mismatch.
 
-  - [ ] 10.1.16 — **AI: "Generate Description" button populates the title field instead of the description field.** In the JavaScript on `content_form.html`, the AJAX success handler for the "Generate Description" button targets `#id_title` instead of `#id_description`, overwriting the user's title with the AI-generated description text.
+  - [x] 10.1.16 — **AI: "Generate Description" button populates the title field instead of the description field.** In the JavaScript on `content_form.html`, the AJAX success handler for the "Generate Description" button targets `#id_title` instead of `#id_description`, overwriting the user's title with the AI-generated description text.
 
-  - [ ] 10.1.17 — **UI: Flash success message appears with error styling (red) on content creation.** In the `ContentCreateView`, use `messages.error()` instead of `messages.success()` when content is created. The message text says "Content created successfully!" but it renders with the red/danger color scheme, confusing the user.
+  - [x] 10.1.17 — **UI: Flash success message appears with error styling (red) on content creation.** In the `ContentCreateView`, use `messages.error()` instead of `messages.success()` when content is created. The message text says "Content created successfully!" but it renders with the red/danger color scheme, confusing the user.
 
-  - [ ] 10.1.18 — **UI: Sidebar "Contents" link points to the categories page.** In `templates/components/sidebar.html`, set the `href` of the "Contents" navigation item to `{% url 'categories:list' %}` instead of `{% url 'contents:list' %}`. The icon and label say "Contents" but clicking it navigates to the categories page.
+  - [x] 10.1.18 — **UI: Sidebar "Contents" link points to the categories page.** In `templates/components/sidebar.html`, set the `href` of the "Contents" navigation item to `{% url 'categories:list' %}` instead of `{% url 'contents:list' %}`. The icon and label say "Contents" but clicking it navigates to the categories page.
 
-  - [ ] 10.1.19 — **AI: "Suggest Category" returns a category that does not belong to the user.** In `AIService.suggest_category`, pass the full list of all categories from the database (`Category.objects.all()`) instead of only the user's categories (`Category.objects.filter(user=user)`) to the AI prompt. The AI may suggest a category name that belongs to another user. When the AJAX success handler tries to match and select it in the dropdown, it either selects nothing (silent failure) or, if the frontend creates the option dynamically, saves the content with a reference to another user's category.
+  - [x] 10.1.19 — **AI: "Suggest Category" returns a category that does not belong to the user.** In `AIService.suggest_category`, pass the full list of all categories from the database (`Category.objects.all()`) instead of only the user's categories (`Category.objects.filter(user=user)`) to the AI prompt. The AI may suggest a category name that belongs to another user. When the AJAX success handler tries to match and select it in the dropdown, it either selects nothing (silent failure) or, if the frontend creates the option dynamically, saves the content with a reference to another user's category.
 
-  - [ ] 10.1.20 — **AI: "Generate Insights" displays the raw markdown/HTML response without sanitization.** In `GenerateInsightsView`, return the AI-generated text and inject it into the DOM using `innerHTML` (in the JavaScript handler) without any sanitization or escaping. Additionally, modify the AI prompt in `AIService.generate_insights` to instruct the model to format the response with HTML tags (`<h3>`, `<ul>`, `<strong>`, etc.). Since the response is rendered unsanitized, if a user manages to influence the AI output (e.g., by having content titles with `<script>` tags), the raw HTML/script is rendered in the insights panel — a stored XSS vector.
+  - [x] 10.1.20 — **AI: "Generate Insights" displays the raw markdown/HTML response without sanitization.** In `GenerateInsightsView`, return the AI-generated text and inject it into the DOM using `innerHTML` (in the JavaScript handler) without any sanitization or escaping. Additionally, modify the AI prompt in `AIService.generate_insights` to instruct the model to format the response with HTML tags (`<h3>`, `<ul>`, `<strong>`, etc.). Since the response is rendered unsanitized, if a user manages to influence the AI output (e.g., by having content titles with `<script>` tags), the raw HTML/script is rendered in the insights panel — a stored XSS vector.
 
-- [ ] **10.2 — Manual Verification of Injected Bugs**
+- [x] **10.2 — Manual Verification of Injected Bugs**
 
-  - [ ] 10.2.1 — Create two test user accounts (e.g., `tester1@studyhub.com` and `tester2@studyhub.com`) with sample data: at least 15 content items each across different types, statuses, categories, and tags
-  - [ ] 10.2.2 — Verify bug 10.1.1: attempt registration with a 2-character password → registration succeeds (should have been rejected)
-  - [ ] 10.2.3 — Verify bug 10.1.2: attempt login with existing email + wrong password, then with non-existent email → different error messages are shown (should be the same generic message)
-  - [ ] 10.2.4 — Verify bug 10.1.3: log in, change password, observe redirect → user is logged out and sent to login page instead of staying on the dashboard
-  - [ ] 10.2.5 — Verify bug 10.1.4: create content leaving the title field empty → form submits and saves an untitled content item
-  - [ ] 10.2.6 — Verify bug 10.1.5: apply "Completed" status filter on the content list → results show everything except completed items
-  - [ ] 10.2.7 — Verify bug 10.1.6: log in as tester1, note the edit URL of one of tester1's content items (e.g., `/contents/5/edit/`). Log in as tester2, navigate directly to that URL → tester1's content is editable by tester2
-  - [ ] 10.2.8 — Verify bug 10.1.7: sort content list by "oldest first" → results are in the same order as "newest first"
-  - [ ] 10.2.9 — Verify bug 10.1.8: click "Mark as Completed" on a content item → status changes to "In Progress" instead
-  - [ ] 10.2.10 — Verify bug 10.1.9: apply a filter that returns few results → total count in the header still shows the unfiltered total
-  - [ ] 10.2.11 — Verify bug 10.1.10: create a category with content, delete the category → all content in that category is also deleted
-  - [ ] 10.2.12 — Verify bug 10.1.11: create two categories with the exact same name → both are saved without error
-  - [ ] 10.2.13 — Verify bug 10.1.12: view the tag list page → all tags show "0 contents" even those with tagged content
-  - [ ] 10.2.14 — Verify bug 10.1.13: delete a tag that is assigned to content → content detail still shows the deleted tag as a broken badge/link
-  - [ ] 10.2.15 — Verify bug 10.1.14: mark several items as completed → "Recently Completed" section shows recently created items regardless of status
-  - [ ] 10.2.16 — Verify bug 10.1.15: log in as tester1 → total content count on the dashboard includes tester2's items
-  - [ ] 10.2.17 — Verify bug 10.1.16: on the content form, enter a title, click "Generate Description" → title field is overwritten with the AI description
-  - [ ] 10.2.18 — Verify bug 10.1.17: create new content → flash message says "Content created successfully!" but appears in red/danger styling
-  - [ ] 10.2.19 — Verify bug 10.1.18: click "Contents" in the sidebar → user is navigated to the categories page instead
-  - [ ] 10.2.20 — Verify bug 10.1.19: as tester1, create categories "AI" and "Career". As tester2, create categories "DevOps" and "Security". Log in as tester1, add new content with title "Kubernetes Best Practices", click "AI Suggest Category" → AI may suggest "DevOps" (tester2's category), which either fails to select in the dropdown or creates an invalid association
-  - [ ] 10.2.21 — Verify bug 10.1.20: create a content item with title `<img src=x onerror=alert('XSS')>`. Navigate to the dashboard, click "Generate Insights" → the insights panel renders unsanitized HTML and the injected script/tag executes or renders in the browser
+  - [x] 10.2.1 — Create two test user accounts (e.g., `tester1@studyhub.com` and `tester2@studyhub.com`) with sample data: at least 15 content items each across different types, statuses, categories, and tags
+  - [x] 10.2.2 — Verify bug 10.1.1: attempt registration with a 2-character password → registration succeeds (should have been rejected)
+  - [x] 10.2.3 — Verify bug 10.1.2: attempt login with existing email + wrong password, then with non-existent email → different error messages are shown (should be the same generic message)
+  - [x] 10.2.4 — Verify bug 10.1.3: log in, change password, observe redirect → user is logged out and sent to login page instead of staying on the dashboard
+  - [x] 10.2.5 — Verify bug 10.1.4: create content leaving the title field empty → form submits and saves an untitled content item
+  - [x] 10.2.6 — Verify bug 10.1.5: apply "Completed" status filter on the content list → results show everything except completed items
+  - [x] 10.2.7 — Verify bug 10.1.6: log in as tester1, note the edit URL of one of tester1's content items (e.g., `/contents/5/edit/`). Log in as tester2, navigate directly to that URL → tester1's content is editable by tester2
+  - [x] 10.2.8 — Verify bug 10.1.7: sort content list by "oldest first" → results are in the same order as "newest first"
+  - [x] 10.2.9 — Verify bug 10.1.8: click "Mark as Completed" on a content item → status changes to "In Progress" instead
+  - [x] 10.2.10 — Verify bug 10.1.9: apply a filter that returns few results → total count in the header still shows the unfiltered total
+  - [x] 10.2.11 — Verify bug 10.1.10: create a category with content, delete the category → all content in that category is also deleted
+  - [x] 10.2.12 — Verify bug 10.1.11: create two categories with the exact same name → both are saved without error
+  - [x] 10.2.13 — Verify bug 10.1.12: view the tag list page → all tags show "0 contents" even those with tagged content
+  - [x] 10.2.14 — Verify bug 10.1.13: delete a tag that is assigned to content → content detail still shows the deleted tag as a broken badge/link
+  - [x] 10.2.15 — Verify bug 10.1.14: mark several items as completed → "Recently Completed" section shows recently created items regardless of status
+  - [x] 10.2.16 — Verify bug 10.1.15: log in as tester1 → total content count on the dashboard includes tester2's items
+  - [x] 10.2.17 — Verify bug 10.1.16: on the content form, enter a title, click "Generate Description" → title field is overwritten with the AI description
+  - [x] 10.2.18 — Verify bug 10.1.17: create new content → flash message says "Content created successfully!" but appears in red/danger styling
+  - [x] 10.2.19 — Verify bug 10.1.18: click "Contents" in the sidebar → user is navigated to the categories page instead
+  - [x] 10.2.20 — Verify bug 10.1.19: as tester1, create categories "AI" and "Career". As tester2, create categories "DevOps" and "Security". Log in as tester1, add new content with title "Kubernetes Best Practices", click "AI Suggest Category" → AI may suggest "DevOps" (tester2's category), which either fails to select in the dropdown or creates an invalid association
+  - [x] 10.2.21 — Verify bug 10.1.20: create a content item with title `<img src=x onerror=alert('XSS')>`. Navigate to the dashboard, click "Generate Insights" → the insights panel renders unsanitized HTML and the injected script/tag executes or renders in the browser
 
 ---
 

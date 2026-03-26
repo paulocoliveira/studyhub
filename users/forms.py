@@ -1,8 +1,10 @@
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from users.models import CustomUser
+
+User = get_user_model()
 
 _INPUT_CLASS = (
     'w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg '
@@ -52,6 +54,26 @@ class EmailAuthenticationForm(AuthenticationForm):
         ),
         'inactive': 'This account is inactive.',
     }
+
+    def clean(self):
+        email = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        if email and password:
+            self.user_cache = authenticate(
+                self.request, username=email, password=password
+            )
+            if self.user_cache is None:
+                if User.objects.filter(email=email).exists():
+                    raise forms.ValidationError(
+                        'Password is incorrect. Please try again.'
+                    )
+                else:
+                    raise forms.ValidationError(
+                        'No account found with this email address.'
+                    )
+            else:
+                self.confirm_login_allowed(self.user_cache)
+        return self.cleaned_data
 
 
 class UserSettingsForm(forms.ModelForm):

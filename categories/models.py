@@ -14,7 +14,6 @@ class Category(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['name', 'user']
         ordering = ['name']
         verbose_name_plural = 'categories'
 

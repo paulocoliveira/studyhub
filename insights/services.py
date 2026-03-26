@@ -303,7 +303,7 @@ class AIService:
 
     def generate_insights(self, user_stats):
         """
-        Returns a markdown analysis string of the user's learning habits, or None on failure.
+        Returns an HTML analysis string of the user's learning habits, or None on failure.
         """
         total = user_stats.get('total_contents', 0)
         by_status = user_stats.get('by_status', {})
@@ -311,7 +311,8 @@ class AIService:
         prompt = (
             f'Analyze these learning content statistics and give 3-5 bullet points of insights '
             f'and 2-3 actionable suggestions. Be encouraging and concise. '
-            f'Format with **bold** headers.\n\n'
+            f'Format your response using HTML tags: use <ul> and <li> for bullet points, '
+            f'<strong> for emphasis, and <p> for paragraphs.\n\n'
             f'Total items: {total}\n'
             f'By status: {by_status}\n'
             f'By type: {by_type}'

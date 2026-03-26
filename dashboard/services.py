@@ -12,7 +12,7 @@ class DashboardService:
     def get_stats(self):
         base_qs = Content.objects.filter(user=self.user)
 
-        total_contents = base_qs.count()
+        total_contents = Content.objects.count()
 
         by_status = {}
         status_counts = (
@@ -48,8 +48,9 @@ class DashboardService:
     def get_recent_completed(self):
         return (
             Content.objects
-            .filter(user=self.user, status='completed')
-            .order_by('-updated_at')[:5]
+            .filter(user=self.user)
+            .select_related('category')
+            .order_by('-created_at')[:5]
         )
 
     def get_top_categories(self):
