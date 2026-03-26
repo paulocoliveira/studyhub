@@ -7,7 +7,8 @@ from django.conf import settings
 
 def build_user_context(user):
     """
-    Build a structured text snapshot of the user's learning data for use as AI context.
+    Build a full snapshot of the user's learning library for use as RAG context.
+    Includes every saved content item with all relevant fields.
     """
     from django.db.models import Count
     from contents.models import Content
@@ -20,38 +21,37 @@ def build_user_context(user):
     new_count = Content.objects.filter(user=user, status='new').count()
     completion_rate = round((completed / total * 100) if total > 0 else 0, 1)
 
-    top_cats = (
-        Category.objects.filter(user=user)
-        .annotate(count=Count('contents'))
-        .filter(count__gt=0)
-        .order_by('-count')[:5]
-    )
-    top_tags = (
-        Tag.objects.filter(user=user)
-        .annotate(count=Count('contents'))
-        .filter(count__gt=0)
-        .order_by('-count')[:5]
-    )
-    recent_contents = (
+    all_contents = (
         Content.objects.filter(user=user)
         .select_related('category')
-        .order_by('-updated_at')[:10]
+        .prefetch_related('tags')
+        .order_by('category__name', 'title')
     )
 
     lines = [
-        f'User learning data snapshot:',
-        f'- Total saved items: {total}',
-        f'- Completed: {completed} ({completion_rate}%)',
-        f'- In progress: {in_progress}',
-        f'- Not started (new): {new_count}',
-        f'',
-        f'Top categories: {", ".join(f"{c.name} ({c.count})" for c in top_cats) or "none"}',
-        f'Top tags: {", ".join(f"{t.name} ({t.count})" for t in top_tags) or "none"}',
-        f'',
-        f'Recent items (last updated):',
+        '=== USER LIBRARY SNAPSHOT ===',
+        f'Total items: {total} | Completed: {completed} ({completion_rate}%) '
+        f'| In progress: {in_progress} | New: {new_count}',
+        '',
+        '=== FULL CONTENT LIST ===',
     ]
-    for item in recent_contents:
-        lines.append(f'  - "{item.title}" [{item.content_type}, {item.status}]')
+
+    for item in all_contents:
+        cat = item.category.name if item.category else 'Uncategorized'
+        tags = ', '.join(item.tags.values_list('name', flat=True)) or 'none'
+        desc = (item.description or '').strip()
+        desc_snippet = (desc[:120] + '…') if len(desc) > 120 else desc
+        url_line = f' | url: {item.url}' if item.url else ''
+        desc_line = f'\n    description: {desc_snippet}' if desc_snippet else ''
+        lines.append(
+            f'[{item.pk}] "{item.title}"'
+            f' | type: {item.content_type}'
+            f' | status: {item.status}'
+            f' | category: {cat}'
+            f' | tags: {tags}'
+            f'{url_line}'
+            f'{desc_line}'
+        )
 
     return '\n'.join(lines)
 
@@ -277,15 +277,25 @@ class AIService:
 
     def chat(self, user, message, history):
         """
-        Multi-turn chat with the user's learning data as context.
+        Multi-turn chat grounded exclusively in the user's saved library data (RAG-style).
         history: list of {'role': 'user'|'assistant', 'content': str}
         Returns assistant reply string or None on failure.
         """
         context = build_user_context(user)
         system_prompt = (
-            f'You are a personal learning assistant for a StudyHub user. '
-            f'You have access to their learning data and can answer questions about their content, '
-            f'habits, and suggest what to study next. Be concise, specific, and encouraging.\n\n'
+            'You are a personal study assistant for StudyHub. '
+            'Your job is to help the user navigate and reflect on their own saved learning library.\n\n'
+            'STRICT RULES — follow these without exception:\n'
+            '1. Answer ONLY based on the data provided below. Do not use any external knowledge, '
+            'do not reference anything outside this dataset, and do not search the internet.\n'
+            '2. If the user asks about something not present in their library, say clearly: '
+            '"I don\'t see that in your library." Do not guess, infer, or fill gaps with general knowledge.\n'
+            '3. Do not recommend content, authors, books, courses, or resources that are not explicitly '
+            'listed in the data below.\n'
+            '4. Do not make up titles, descriptions, categories, or any other field values.\n'
+            '5. You may reason about patterns, counts, and relationships within the provided data '
+            '(e.g. "you have 3 items in the QA category", "you haven\'t finished X yet").\n'
+            '6. Be concise and direct. Avoid filler phrases.\n\n'
             f'{context}'
         )
         messages = list(history) + [{'role': 'user', 'content': message}]
