@@ -4,18 +4,33 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 
 ## Color Palette
 
-| Token | TailwindCSS Class | Hex | Usage |
+Near-black neutral backgrounds with vibrant green as accent. Rule: if a color is a background/surface → use `zinc` family. If it's an accent (interactive, link, highlight, icon, active state, button gradient) → use `green`/`emerald`.
+
+| Token | TailwindCSS Class | Hex approx | Usage |
 |---|---|---|---|
-| Background Primary | `bg-gray-950` | `#030712` | Page background |
-| Background Secondary | `bg-gray-900` | `#111827` | Cards, panels, sidebars |
-| Background Tertiary | `bg-gray-800` | `#1F2937` | Input fields, hover states |
-| Border | `border-gray-700` | `#374151` | Borders, dividers |
-| Text Primary | `text-gray-100` | `#F3F4F6` | Headings, primary text |
-| Text Secondary | `text-gray-400` | `#9CA3AF` | Descriptions, labels |
-| Text Muted | `text-gray-500` | `#6B7280` | Placeholders, hints |
-| Accent | `text-violet-500` | `#8B5CF6` | Primary actions, active states |
-| Gradient From | `from-violet-600` | `#7C3AED` | Gradient start |
-| Gradient To | `to-indigo-600` | `#4F46E5` | Gradient end |
+| Background Primary | `bg-zinc-950` | `#09090b` | Page background |
+| Background Secondary | `bg-zinc-900` | `#18181b` | Cards, panels, sidebars |
+| Background Elevated | `bg-zinc-800/60` | | Inputs, elevated surfaces |
+| Border | `border-zinc-800` | `#27272a` | Default borders |
+| Border Subtle | `border-zinc-700` | `#3f3f46` | Hover/elevated borders |
+| Divider | `divide-zinc-800` | | List dividers |
+| Text Primary | `text-zinc-100` | `#f4f4f5` | Headings, primary text |
+| Text Secondary | `text-zinc-400` | `#a1a1aa` | Descriptions, labels |
+| Text Muted | `text-zinc-600` | `#52525b` | Placeholders, hints |
+| Accent | `text-green-400` | `#4ade80` | Links, active states, icons |
+| Accent Dim | `text-green-300` | `#86efac` | Accent hover states |
+| Active Nav BG | `bg-green-500/10` | | Active sidebar item background |
+| Active Nav Text | `text-green-400` | | Active sidebar item text |
+| Nav Hover | `hover:bg-zinc-800 hover:text-zinc-100` | | Default nav item hover |
+| Input BG | `bg-zinc-800` | | Form inputs |
+| Input Border | `border-zinc-700` | | Input borders |
+| Input Focus | `focus:ring-green-500/40 focus:border-green-500/50` | | Input focus ring |
+| Primary Button | `from-green-500 to-emerald-600` gradient | | CTA buttons |
+| Primary Button Hover | `hover:from-green-400 hover:to-emerald-500` | | CTA hover |
+| Button Shadow | `shadow-green-500/20` | | Button glow |
+| Brand Logo Gradient | `from-green-400 to-emerald-500` | | Logo icon |
+| Brand Text Gradient | `from-green-400 to-emerald-400` | | "StudyHub" wordmark |
+| Mobile Overlay | `bg-black/70 backdrop-blur-sm` | | Mobile sidebar backdrop |
 | Success | `text-emerald-500` | `#10B981` | Completed status |
 | Warning | `text-amber-500` | `#F59E0B` | In-progress status |
 | Danger | `text-rose-500` | `#F43F5E` | Delete actions, errors |
@@ -26,38 +41,38 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 | Element | TailwindCSS Classes |
 |---|---|
 | Font Family | `font-sans` (Inter, system-ui, sans-serif) |
-| Page Title | `text-3xl font-bold text-gray-100` |
-| Section Title | `text-xl font-semibold text-gray-100` |
-| Card Title | `text-lg font-medium text-gray-100` |
-| Body Text | `text-sm text-gray-300` |
-| Label | `text-sm font-medium text-gray-400` |
-| Helper Text | `text-xs text-gray-500` |
+| Page Title | `text-3xl font-bold text-white` |
+| Section Title | `text-xl font-semibold text-white` |
+| Card Title | `text-lg font-medium text-zinc-100` |
+| Body Text | `text-sm text-zinc-400` |
+| Label | `text-sm font-medium text-zinc-400` |
+| Helper Text | `text-xs text-zinc-600` |
 
 ## Gradient Patterns
 
 ```html
 <!-- Primary gradient (buttons, hero) -->
-<div class="bg-gradient-to-r from-violet-600 to-indigo-600">
+<div class="bg-gradient-to-r from-green-500 to-emerald-600">
 
 <!-- Subtle card gradient -->
-<div class="bg-gradient-to-br from-gray-900 via-gray-900 to-violet-950/20">
+<div class="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-800/30">
 
-<!-- Text gradient -->
-<h1 class="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+<!-- Text gradient (brand) -->
+<span class="bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
 ```
 
 ## Buttons
 
 ```html
 <!-- Primary -->
-<button class="px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600
+<button class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600
     text-white text-sm font-medium rounded-lg
-    hover:from-violet-500 hover:to-indigo-500
-    transition-all duration-200 shadow-lg shadow-violet-500/25">
+    hover:from-green-400 hover:to-emerald-500
+    transition-all duration-200 shadow-lg shadow-green-500/20">
 
 <!-- Secondary -->
-<button class="px-4 py-2 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg
-    border border-gray-700 hover:bg-gray-700 hover:text-white
+<button class="px-4 py-2 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-lg
+    border border-zinc-700 hover:bg-zinc-700 hover:text-white
     transition-all duration-200">
 
 <!-- Danger -->
@@ -66,7 +81,7 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
     transition-all duration-200">
 
 <!-- Ghost / Icon -->
-<button class="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg
+<button class="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg
     transition-all duration-200">
 ```
 
@@ -75,25 +90,25 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 ```html
 <!-- Text Input -->
 <input type="text"
-    class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg
-    text-gray-100 text-sm placeholder-gray-500
-    focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500
+    class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg
+    text-zinc-100 text-sm placeholder-zinc-600
+    focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50
     transition-all duration-200">
 
 <!-- Select -->
-<select class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg
-    text-gray-100 text-sm
-    focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500
+<select class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg
+    text-zinc-100 text-sm
+    focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50
     transition-all duration-200">
 
 <!-- Textarea -->
-<textarea class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg
-    text-gray-100 text-sm placeholder-gray-500
-    focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500
+<textarea class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg
+    text-zinc-100 text-sm placeholder-zinc-600
+    focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50
     transition-all duration-200 resize-none" rows="4">
 
 <!-- Label -->
-<label class="block text-sm font-medium text-gray-400 mb-1">
+<label class="block text-sm font-medium text-zinc-400 mb-1">
 
 <!-- Error -->
 <p class="mt-1 text-xs text-rose-500">This field is required.</p>
@@ -103,41 +118,36 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 
 ```html
 <!-- Standard Card -->
-<div class="bg-gray-900 border border-gray-800 rounded-xl p-5
-    hover:border-gray-700 transition-all duration-200">
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5
+    hover:border-zinc-700 transition-all duration-200">
 
 <!-- Stats Card -->
-<div class="bg-gradient-to-br from-gray-900 to-gray-900/50
-    border border-gray-800 rounded-xl p-5">
-    <p class="text-sm text-gray-400">Label</p>
-    <p class="text-2xl font-bold text-gray-100 mt-1">Value</p>
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5
+    hover:border-zinc-700 transition-all duration-200">
+    <p class="text-sm text-zinc-400">Label</p>
+    <p class="text-2xl font-bold text-white mt-1">Value</p>
 </div>
 ```
 
 ## Content Card (card grid view)
 
 ```html
-<div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden
-    hover:border-gray-700 transition-all duration-200 flex flex-col">
+<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden
+    hover:border-zinc-700 transition-all duration-200 flex flex-col">
 
     <!-- Thumbnail -->
-    <div class="aspect-video bg-gray-800 relative overflow-hidden">
+    <div class="aspect-video bg-zinc-800 relative overflow-hidden">
         <img src="{{ card_image_url }}" alt=""
             class="w-full h-full object-cover"
             onerror="this.src='{% static 'images/placeholders/' %}{{ content.content_type }}.svg'">
-        <span class="absolute top-2 right-2 px-2 py-0.5 text-xs font-medium rounded-full
-            bg-gray-900/80 text-gray-300 backdrop-blur-sm">
-            {{ content.get_content_type_display }}
-        </span>
     </div>
 
     <!-- Body -->
     <div class="p-4 flex flex-col flex-1 gap-2">
-        <h3 class="text-sm font-medium text-gray-100 line-clamp-2">{{ content.title }}</h3>
-        <p class="text-xs text-gray-500 line-clamp-2">{{ content.description }}</p>
-        <div class="mt-auto flex items-center justify-between pt-3">
-            <!-- status badge -->
-            <span class="text-xs text-gray-600">{{ content.created_at|date:"M d" }}</span>
+        <h3 class="text-sm font-medium text-zinc-100 line-clamp-2">{{ content.title }}</h3>
+        <p class="text-xs text-zinc-500 line-clamp-2">{{ content.description }}</p>
+        <div class="mt-auto flex items-center justify-between pt-3 border-t border-zinc-800">
+            <span class="text-xs text-zinc-600">{{ content.created_at|date:"M d" }}</span>
         </div>
     </div>
 </div>
@@ -165,8 +175,8 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 
 ```html
 <!-- Page layout (sidebar + main) -->
-<div class="flex min-h-screen bg-gray-950">
-    <aside class="w-64 bg-gray-900 border-r border-gray-800 min-h-screen p-4">
+<div class="flex min-h-screen bg-zinc-950">
+    <aside class="w-64 bg-zinc-900 border-r border-zinc-800 min-h-screen p-4">
     <main class="flex-1 p-6">
 
 <!-- Stats grid -->
@@ -184,24 +194,24 @@ Dark-themed UI using TailwindCSS utility classes in Django Template Language. Al
 ```html
 <!-- Active item -->
 <a class="flex items-center gap-3 px-3 py-2 rounded-lg
-    bg-violet-600/10 text-violet-400 text-sm font-medium">
+    bg-green-500/10 text-green-400 text-sm font-medium">
 
 <!-- Default item -->
 <a class="flex items-center gap-3 px-3 py-2 rounded-lg
-    text-gray-400 text-sm hover:bg-gray-800 hover:text-gray-200
+    text-zinc-400 text-sm hover:bg-zinc-800 hover:text-zinc-100
     transition-all duration-200">
 ```
 
 ## View Toggle (card / list)
 
 ```html
-<div class="flex items-center gap-1 bg-gray-800 rounded-lg p-0.5">
+<div class="flex items-center gap-1 bg-zinc-800/60 rounded-lg p-0.5">
     <button data-view="cards"
-        class="p-1.5 rounded-md text-gray-400 hover:text-white
-        data-[active]:bg-gray-700 data-[active]:text-white transition-all duration-200">
+        class="p-1.5 rounded-md text-zinc-400 hover:text-white
+        transition-all duration-200">
     <button data-view="list"
-        class="p-1.5 rounded-md text-gray-400 hover:text-white
-        data-[active]:bg-gray-700 data-[active]:text-white transition-all duration-200">
+        class="p-1.5 rounded-md text-zinc-400 hover:text-white
+        transition-all duration-200">
 </div>
 ```
 

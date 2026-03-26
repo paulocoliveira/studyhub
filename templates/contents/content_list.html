@@ -9,18 +9,18 @@
     {# Page header #}
     <div class='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6'>
         <div class='flex items-center gap-3'>
-            <h1 class='text-3xl font-bold text-gray-100'>My Contents</h1>
+            <h1 class='text-3xl font-bold text-white'>My Contents</h1>
             {% if paginator %}
-            <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20'>
+            <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-zinc-800/60 text-zinc-400 border border-zinc-700'>
                 {{ paginator.count }} item{{ paginator.count|pluralize }}
             </span>
             {% endif %}
         </div>
         <a href='{% url "contents:create" %}'
-            class='inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600
+            class='inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600
                 text-white text-sm font-medium rounded-lg
-                hover:from-violet-500 hover:to-indigo-500
-                transition-all duration-200 shadow-lg shadow-violet-500/25
+                hover:from-green-500 hover:to-emerald-500
+                transition-all duration-200 shadow-lg shadow-green-500/25
                 self-start sm:self-auto'>
             <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                 <line x1='12' y1='5' x2='12' y2='19'/>
@@ -32,7 +32,7 @@
 
     {# Filter bar #}
     <form method='GET' class='mb-6' role='search'>
-        <div class='bg-gray-900 border border-gray-800 rounded-xl p-4'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-4'>
             <div class='flex flex-col md:flex-row gap-3'>
 
                 {# Search input #}
@@ -40,7 +40,7 @@
                     <label for='id_search' class='sr-only'>Search contents</label>
                     <div class='relative'>
                         <div class='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                            <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-gray-500' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                            <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-zinc-500' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                                 <circle cx='11' cy='11' r='8'/>
                                 <line x1='21' y1='21' x2='16.65' y2='16.65'/>
                             </svg>
@@ -81,9 +81,9 @@
 
             {# Clear filters link #}
             {% if request.GET %}
-            <div class='mt-3 pt-3 border-t border-gray-800'>
+            <div class='mt-3 pt-3 border-t border-zinc-800'>
                 <a href='{% url "contents:list" %}'
-                    class='inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors duration-200'>
+                    class='inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors duration-200'>
                     <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                         <line x1='18' y1='6' x2='6' y2='18'/>
                         <line x1='6' y1='6' x2='18' y2='18'/>
@@ -97,12 +97,12 @@
 
     {# View toggle #}
     <div class='flex items-center justify-between mb-4'>
-        <p class='text-sm text-gray-500'>
+        <p class='text-sm text-zinc-600'>
             {% if page_obj %}
                 Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ paginator.count }} item{{ paginator.count|pluralize }}
             {% endif %}
         </p>
-        <div class='flex items-center gap-1 bg-gray-800 rounded-lg p-0.5' role='group' aria-label='View toggle'>
+        <div class='flex items-center gap-1 bg-zinc-800/60 rounded-lg p-0.5' role='group' aria-label='View toggle'>
             <button id='btn-view-cards' data-view='cards' type='button'
                 class='p-1.5 rounded-md transition-all duration-200'
                 aria-label='Card grid view'
@@ -142,8 +142,8 @@
         {# List view (hidden by default, toggled via JS) #}
         <div id='view-list-container' class='hidden flex flex-col gap-2'>
             {% for content in contents %}
-            <article class='bg-gray-900 border border-gray-800 rounded-xl px-5 py-4
-                hover:border-gray-700 transition-all duration-200 flex items-start gap-4'>
+            <article class='bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-4
+                hover:border-zinc-700 transition-all duration-200 flex items-start gap-4'>
 
                 {# Left: badges column #}
                 <div class='shrink-0 flex flex-col gap-1.5 items-start pt-0.5'>
@@ -178,25 +178,25 @@
                 <div class='flex-1 min-w-0'>
                     <h2 class='text-white font-semibold truncate'>
                         <a href='{% url "contents:detail" content.pk %}'
-                            class='hover:text-violet-400 transition-colors duration-200'>
+                            class='hover:text-green-400 transition-colors duration-200'>
                             {{ content.title }}
                         </a>
                     </h2>
                     <div class='flex items-center flex-wrap gap-x-3 gap-y-1 mt-1'>
                         {% if content.category %}
-                        <span class='flex items-center gap-1 text-xs text-gray-500'>
+                        <span class='flex items-center gap-1 text-xs text-zinc-600'>
                             <svg xmlns='http://www.w3.org/2000/svg' class='h-3 w-3' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                                 <path d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'/>
                             </svg>
                             {{ content.category.name }}
                         </span>
                         {% endif %}
-                        <span class='text-xs text-gray-600'>{{ content.created_at|date:"M d, Y" }}</span>
+                        <span class='text-xs text-zinc-600'>{{ content.created_at|date:"M d, Y" }}</span>
                     </div>
                     {% if content.tags.all %}
                     <div class='flex flex-wrap gap-1.5 mt-2'>
                         {% for tag in content.tags.all|slice:":3" %}
-                        <span class='px-2 py-0.5 text-xs font-medium rounded-full bg-violet-500/10 text-violet-400'>{{ tag.name }}</span>
+                        <span class='px-2 py-0.5 text-xs font-medium rounded-full bg-green-500/10 text-green-400 border border-green-500/20'>{{ tag.name }}</span>
                         {% endfor %}
                     </div>
                     {% endif %}
@@ -205,7 +205,7 @@
                 {# Right: actions #}
                 <div class='shrink-0 flex items-center gap-1'>
                     <a href='{% url "contents:detail" content.pk %}'
-                        class='p-1.5 text-gray-500 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-all duration-200'
+                        class='p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-all duration-200'
                         aria-label='View {{ content.title }}'>
                         <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                             <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/>
@@ -213,7 +213,7 @@
                         </svg>
                     </a>
                     <a href='{% url "contents:update" content.pk %}'
-                        class='p-1.5 text-gray-500 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-all duration-200'
+                        class='p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-all duration-200'
                         aria-label='Edit {{ content.title }}'>
                         <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                             <path d='M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7'/>
@@ -244,8 +244,8 @@
 
         {# Empty state #}
         <div class='flex flex-col items-center justify-center py-24 text-center'>
-            <div class='w-16 h-16 rounded-2xl bg-gray-900 border border-gray-800 flex items-center justify-center mb-5'>
-                <svg xmlns='http://www.w3.org/2000/svg' class='h-8 w-8 text-gray-600' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+            <div class='w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mb-5'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-8 w-8 text-zinc-600' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                     <path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/>
                     <polyline points='14 2 14 8 20 8'/>
                     <line x1='16' y1='13' x2='8' y2='13'/>
@@ -254,26 +254,26 @@
                 </svg>
             </div>
             {% if request.GET %}
-            <h2 class='text-lg font-semibold text-gray-100 mb-2'>No contents match your filters</h2>
-            <p class='text-sm text-gray-400 mb-6 max-w-xs'>
+            <h2 class='text-lg font-semibold text-white mb-2'>No contents match your filters</h2>
+            <p class='text-sm text-zinc-400 mb-6 max-w-xs'>
                 Try adjusting your search or filter criteria to find what you're looking for.
             </p>
             <a href='{% url "contents:list" %}'
-                class='inline-flex items-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg
-                    border border-gray-700 hover:bg-gray-700 hover:text-white
+                class='inline-flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-lg
+                    border border-zinc-700 hover:bg-zinc-700 hover:text-white
                     transition-all duration-200'>
                 Clear filters
             </a>
             {% else %}
-            <h2 class='text-lg font-semibold text-gray-100 mb-2'>No contents yet</h2>
-            <p class='text-sm text-gray-400 mb-6 max-w-xs'>
+            <h2 class='text-lg font-semibold text-white mb-2'>No contents yet</h2>
+            <p class='text-sm text-zinc-400 mb-6 max-w-xs'>
                 Start building your learning library by adding your first content item.
             </p>
             <a href='{% url "contents:create" %}'
-                class='inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600
+                class='inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600
                     text-white text-sm font-medium rounded-lg
-                    hover:from-violet-500 hover:to-indigo-500
-                    transition-all duration-200 shadow-lg shadow-violet-500/25'>
+                    hover:from-green-500 hover:to-emerald-500
+                    transition-all duration-200 shadow-lg shadow-green-500/25'>
                 <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                     <line x1='12' y1='5' x2='12' y2='19'/>
                     <line x1='5' y1='12' x2='19' y2='12'/>
@@ -306,12 +306,12 @@
 
         // Toggle button active states
         if (btnCards) {
-            btnCards.classList.toggle('bg-gray-700', isCards);
+            btnCards.classList.toggle('bg-zinc-700', isCards);
             btnCards.classList.toggle('text-white', isCards);
             btnCards.classList.toggle('text-gray-400', !isCards);
         }
         if (btnList) {
-            btnList.classList.toggle('bg-gray-700', !isCards);
+            btnList.classList.toggle('bg-zinc-700', !isCards);
             btnList.classList.toggle('text-white', !isCards);
             btnList.classList.toggle('text-gray-400', isCards);
         }

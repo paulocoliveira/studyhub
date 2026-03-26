@@ -1,8 +1,8 @@
 {% load static %}
-<div class='bg-gray-900 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-all duration-200 flex flex-col'>
+<div class='bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all duration-200 flex flex-col'>
 
   {# Image area #}
-  <div class='relative aspect-video bg-gray-800 overflow-hidden'>
+  <div class='relative aspect-video bg-zinc-800 overflow-hidden'>
     <img
       src='{{ content.get_card_image }}'
       alt='{{ content.title }}'
@@ -42,38 +42,38 @@
 
   {# Card body #}
   <div class='p-4 flex flex-col flex-1'>
-    <h3 class='text-sm font-semibold text-gray-100 line-clamp-2 mb-1'>
-      <a href='{% url "contents:detail" content.pk %}' class='hover:text-violet-400 transition-colors'>{{ content.title }}</a>
+    <h3 class='text-sm font-semibold text-zinc-100 line-clamp-2 mb-1'>
+      <a href='{% url "contents:detail" content.pk %}' class='hover:text-green-400 transition-colors'>{{ content.title }}</a>
     </h3>
     {% if content.description %}
-      <p class='text-xs text-gray-500 line-clamp-2 mb-3'>{{ content.description }}</p>
+      <p class='text-xs text-zinc-500 line-clamp-2 mb-3'>{{ content.description }}</p>
     {% endif %}
 
     {# Category #}
     {% if content.category %}
-      <span class='text-xs text-gray-500 mb-2'>&#128193; {{ content.category.name }}</span>
+      <span class='text-xs text-zinc-500 mb-2'>&#128193; {{ content.category.name }}</span>
     {% endif %}
 
     {# Tags — max 3 visible + overflow #}
     {% if content.tags.all %}
       <div class='flex flex-wrap gap-1 mb-3'>
         {% for tag in content.tags.all|slice:":3" %}
-          <span class='px-1.5 py-0.5 text-xs rounded bg-gray-800 text-gray-400 border border-gray-700'>{{ tag.name }}</span>
+          <span class='px-1.5 py-0.5 text-xs rounded bg-zinc-800 text-zinc-400 border border-zinc-700'>{{ tag.name }}</span>
         {% endfor %}
         {% with total=content.tags.count %}
           {% if total > 3 %}
-            <span class='px-1.5 py-0.5 text-xs rounded bg-gray-800 text-gray-500'>+{{ total|add:"-3" }}</span>
+            <span class='px-1.5 py-0.5 text-xs rounded bg-zinc-800 text-zinc-500'>+{{ total|add:"-3" }}</span>
           {% endif %}
         {% endwith %}
       </div>
     {% endif %}
 
     {# Footer spacer + actions #}
-    <div class='mt-auto pt-3 border-t border-gray-800 flex items-center justify-between gap-2'>
-      <span class='text-xs text-gray-600'>{{ content.created_at|date:"M d, Y" }}</span>
+    <div class='mt-auto pt-3 border-t border-zinc-800 flex items-center justify-between gap-2'>
+      <span class='text-xs text-zinc-600'>{{ content.created_at|date:"M d, Y" }}</span>
       <div class='flex items-center gap-2'>
-        <a href='{% url "contents:detail" content.pk %}' class='text-xs text-gray-400 hover:text-violet-400 transition-colors'>View</a>
-        <a href='{% url "contents:update" content.pk %}' class='text-xs text-gray-400 hover:text-violet-400 transition-colors'>Edit</a>
+        <a href='{% url "contents:detail" content.pk %}' class='text-xs text-zinc-400 hover:text-green-400 transition-colors'>View</a>
+        <a href='{% url "contents:update" content.pk %}' class='text-xs text-zinc-400 hover:text-green-400 transition-colors'>Edit</a>
       </div>
     </div>
   </div>

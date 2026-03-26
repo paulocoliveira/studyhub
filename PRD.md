@@ -147,6 +147,21 @@ The purpose of StudyHub is to provide a centralized, organized, and intelligent 
 - **FR-37:** The system must offer AI-powered consumption insights on the dashboard (e.g., reading habits, suggestions)
 - **FR-38:** AI features must be triggered explicitly by the user (button click), never automatic
 
+### 6.8 Personalized AI Learning Intelligence
+
+- **FR-39:** The system must offer a "What to Study Next" AI feature that analyzes the user's content marked as New or In Progress and recommends a prioritized list of items to study next, based on recency, category patterns, and consumption history. Triggered by user action.
+- **FR-40:** The system must identify "forgotten" content: items saved more than 30 days ago that have never progressed beyond "New" status. These items must be surfaced in a dedicated section on the Insights page so the user can act on them (study, archive, or delete).
+- **FR-41:** The system must detect recurring topics from the user's tags and categories and suggest opportunities for deeper study (e.g., "You have 9 items tagged 'Python' — consider exploring advanced topics"). AI-generated. Triggered by user action.
+- **FR-42:** The system must generate a weekly learning summary: a concise narrative covering how many items were completed that week, how many remain in progress, and which category or tag was most active. Displayed on the dashboard or Insights page. Triggered by user action (not automatic).
+
+### 6.9 AI Chat (Learning Assistant)
+
+- **FR-43:** The Insights page must include an AI chat interface where the user can ask natural language questions about their learning data. Examples: "What topics am I studying most?", "Which content have I been procrastinating on?", "Suggest a study plan for this week."
+- **FR-44:** The chat must use a RAG-like approach: before each AI call, the system builds a structured context snapshot from the user's database — content titles, types, statuses, categories, tags, and completion history — and injects it into the AI prompt alongside the user's question. No external vector store is required; the context is assembled in Python from ORM queries.
+- **FR-45:** The chat must support multi-turn conversation within a session (the UI maintains a visible message history; prior messages are included in subsequent AI calls as context).
+- **FR-46:** The chat history must not be persisted to the database. It lives only in the browser session. On page reload, the conversation resets.
+- **FR-47:** The chat must handle AI errors gracefully: if the API call fails, display a clear error message in the chat UI without crashing the page.
+
 ### 6.8 UX Flowchart
 
 ```mermaid
@@ -185,6 +200,11 @@ flowchart TD
 
     J --> J1[View Consumption Insights]
     J --> J2[AI: Generate Insights]
+    J --> J3[AI: What to Study Next]
+    J --> J4[AI: Forgotten Content]
+    J --> J5[AI: Topic Patterns]
+    J --> J6[AI: Weekly Summary]
+    J --> J7[AI Chat — Ask anything about your data]
 
     F --> K[User Menu]
     K --> K1[Change Password]
@@ -658,14 +678,37 @@ All pages extend a `base.html` template that provides:
 | US-27 | As a user, I want AI to generate a description for my content | Button on content form triggers AI call. Generated description populates the description field. User can edit before saving. |
 | US-28 | As a user, I want AI to provide insights about my consumption habits | Insights page on the dashboard shows AI-generated analysis of: content type distribution, completion rate, and suggestions for improvement. Triggered by explicit button click. |
 
-### Epic 7: Account Management
+### Epic 7: Personalized AI Learning Intelligence
 
-> **E7 — As a user, I want to manage my account securely.**
+> **E7 — As a user, I want AI to help me prioritize and reflect on my learning habits.**
+
+| ID | Story | Acceptance Criteria |
+|---|---|---|
+| US-31 | As a user, I want AI to tell me what I should study next | A "What to Study Next" button on the Insights page sends my New and In Progress content to the AI and returns a prioritized recommendation list. |
+| US-32 | As a user, I want to see content I have been neglecting | The Insights page shows a "Forgotten Content" section listing items saved more than 30 days ago with status still "New". I can click through to each item. |
+| US-33 | As a user, I want AI to identify my recurring topics and suggest depth | A "Topic Patterns" button analyzes my most used tags and categories and returns AI-generated suggestions for deepening my knowledge in those areas. |
+| US-34 | As a user, I want a weekly summary of my learning activity | A "Weekly Summary" button generates a short narrative about my activity over the past 7 days: completions, in-progress items, and most active topic area. |
+
+### Epic 8: AI Chat — Learning Assistant
+
+> **E8 — As a user, I want to have a conversation with an AI assistant about my learning data.**
+
+| ID | Story | Acceptance Criteria |
+|---|---|---|
+| US-35 | As a user, I want to ask free-form questions about my content | The Insights page has a chat panel where I can type a question and receive an AI-generated answer grounded in my actual data. |
+| US-36 | As a user, I want the AI to remember the context of our conversation | Sending follow-up messages in the same session includes the previous turns in the AI prompt. The chat history is visible in the UI. |
+| US-37 | As a user, I want the chat to reset when I reload the page | The conversation is session-only. There is no persistent chat history in the database. A fresh conversation starts on each page load. |
+| US-38 | As a user, I want clear feedback if the AI is unavailable | If the AI API fails, the chat shows a friendly error message without breaking the page. |
+
+### Epic 9: Account Management
+
+> **E9 — As a user, I want to manage my account securely.**
 
 | ID | Story | Acceptance Criteria |
 |---|---|---|
 | US-29 | As a user, I want to change my password | Password change form with current password, new password, and confirmation. Uses Django's native password change view. |
 | US-30 | As a user, I want to log out | Logout button accessible from any authenticated page. Redirects to landing page. |
+| US-39 | As a user, I want to configure my AI provider and API key | Settings screen allows choosing between Anthropic (Claude) and OpenAI (GPT) and saving an API key. The key is stored per user and used for all AI features. |
 
 ---
 

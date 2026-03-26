@@ -284,125 +284,186 @@
 
 ---
 
-### Sprint 8: Testing
+### Sprint 8: Advanced AI & Learning Intelligence
 
-> **Goal:** Add automated tests for critical functionality.
+> **Goal:** Extend the AI layer with personalized learning recommendations, forgotten content detection, topic pattern analysis, weekly summaries, and a conversational AI chat grounded in the user's own data (RAG-like).
 
-- [ ] **8.1 — User Authentication Tests**
-  - [ ] 8.1.1 — Write tests in `users/tests.py` for: user registration with valid data succeeds, registration with duplicate email fails, registration with mismatched passwords fails
-  - [ ] 8.1.2 — Write tests for: login with correct email/password succeeds, login with wrong password fails, login with non-existent email fails
-  - [ ] 8.1.3 — Write tests for: authenticated user can access dashboard, unauthenticated user is redirected to login
+- [ ] **8.1 — "What to Study Next" Feature**
+  - [ ] 8.1.1 — Add a `suggest_next(user)` method to `AIService` in `insights/services.py`: query the user's content with status `new` or `in_progress`, ordered by `created_at`. Build a structured prompt listing each item (title, type, category, tags, days since saved). Ask the AI to return a prioritized list of 3–5 items to focus on next with a one-line reason for each.
+  - [ ] 8.1.2 — Create `SuggestNextView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }` with the rendered recommendation list. Reuse the existing rate-limiting pattern.
+  - [ ] 8.1.3 — Add URL `suggest-next/` to `insights/urls.py`.
+  - [ ] 8.1.4 — Add a "What to Study Next" card on the Insights page with a trigger button, loading state, and result area.
 
-- [ ] **8.2 — Content CRUD Tests**
-  - [ ] 8.2.1 — Write tests in `contents/tests.py` for: creating content with valid data, creating content with missing required fields fails
-  - [ ] 8.2.2 — Write tests for: user can only see their own content, user cannot access another user's content detail/edit/delete
-  - [ ] 8.2.3 — Write tests for: content status update works correctly, content deletion works correctly
-  - [ ] 8.2.4 — Write tests for: content list filtering by status, type, and category returns correct results
-  - [ ] 8.2.5 — Write tests for: content list search returns correct results
+- [ ] **8.2 — Forgotten Content Detection**
+  - [ ] 8.2.1 — Add a `get_forgotten_contents(user, days=30)` method to `DashboardService` (or a new `InsightsService`): returns content items with `status='new'` and `created_at__lte=now()-timedelta(days=days)`, ordered by `created_at` ascending (oldest first), limited to 10 items.
+  - [ ] 8.2.2 — Add a `ForgottenContentsView` in `insights/views.py`: `LoginRequiredMixin`, GET, returns JSON list of forgotten content items (id, title, type, days_since_saved, url to detail page).
+  - [ ] 8.2.3 — Add URL `forgotten-contents/` to `insights/urls.py`.
+  - [ ] 8.2.4 — Add a "Forgotten Content" section to the Insights page: auto-loaded on page render (no button needed), shows a list of items with title, type badge, days-since-saved label, and a link to the detail page. If empty, show a positive empty state ("Nothing forgotten — great job!").
 
-- [ ] **8.3 — Category & Tag Tests**
-  - [ ] 8.3.1 — Write tests in `categories/tests.py` for: category CRUD operations, user scoping (user A cannot see/edit user B's categories)
-  - [ ] 8.3.2 — Write tests in `tags/tests.py` for: tag CRUD operations, user scoping, duplicate tag name per user fails
+- [ ] **8.3 — Topic Pattern Analysis**
+  - [ ] 8.3.1 — Add a `analyze_topics(user)` method to `AIService`: build a prompt listing the user's top 10 tags and top 5 categories with their content counts. Ask the AI to identify patterns and suggest 2–3 directions for deeper study.
+  - [ ] 8.3.2 — Create `AnalyzeTopicsView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
+  - [ ] 8.3.3 — Add URL `analyze-topics/` to `insights/urls.py`.
+  - [ ] 8.3.4 — Add a "Topic Patterns" card on the Insights page with a trigger button, loading state, and result area.
 
-- [ ] **8.4 — Dashboard Tests**
-  - [ ] 8.4.1 — Write tests in `dashboard/tests.py` for: dashboard loads for authenticated user, stats are correctly calculated (create test data and verify counts)
+- [ ] **8.4 — Weekly Learning Summary**
+  - [ ] 8.4.1 — Add a `weekly_summary(user)` method to `AIService`: query content updated in the last 7 days (completed items), content created in the last 7 days (new additions), and the most active category/tag in that period. Build a prompt and ask the AI to write a short narrative summary (2–3 sentences).
+  - [ ] 8.4.2 — Create `WeeklySummaryView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
+  - [ ] 8.4.3 — Add URL `weekly-summary/` to `insights/urls.py`.
+  - [ ] 8.4.4 — Add a "Weekly Summary" card on the Insights page with a trigger button and result area. Style the result as a highlighted quote/callout block.
 
-- [ ] **8.5 — AI Service Tests**
-  - [ ] 8.5.1 — Write tests in `insights/tests.py` for: AI views return proper JSON responses (mock the API calls), AI views require authentication, error handling when API fails
+- [ ] **8.5 — AI Chat Interface (Learning Assistant)**
+  - [ ] 8.5.1 — Add a `build_user_context(user)` function in `insights/services.py`: queries the user's data and assembles a structured plain-text or JSON snapshot including: total content count, status breakdown, top 5 categories with counts, top 5 tags with counts, last 10 content titles with type/status, completion rate percentage. This is the "knowledge base" injected into each chat prompt.
+  - [ ] 8.5.2 — Add a `chat(user, message, history)` method to `AIService`: takes the user's message, the assembled context from `build_user_context()`, and the prior conversation `history` (list of `{role, content}` dicts). Builds a system prompt that establishes the AI as a personal learning assistant with access to the user's data. Calls the configured AI provider (Anthropic or OpenAI) with the full message history. Returns the assistant's reply string.
+  - [ ] 8.5.3 — Create `ChatView` in `insights/views.py`: `LoginRequiredMixin`, POST. Accepts JSON body `{ "message": "...", "history": [...] }`. Calls `AIService.chat()`. Returns JSON `{ "reply": "..." }`. Apply rate limiting (max 20 messages per user per day via session counter).
+  - [ ] 8.5.4 — Add URL `chat/` to `insights/urls.py`.
+  - [ ] 8.5.5 — Build the chat UI on the Insights page: a fixed-height scrollable message list (`#chat-messages`) with user and assistant message bubbles styled distinctly; a text input + send button at the bottom; a "New conversation" button that clears the UI history. The conversation history array lives in a JS variable — it is never stored in the database.
+  - [ ] 8.5.6 — Implement the chat JavaScript: on send, append the user message to the UI and history array, POST to `chat/` with the current message and history, append the assistant reply on success, handle error state inline (red message bubble with retry hint).
+  - [ ] 8.5.7 — Add suggested starter questions as clickable chips above the input: "What should I study next?", "Which topics am I most focused on?", "What have I been ignoring?", "Give me a weekly summary." Clicking a chip populates the input and auto-sends.
+
+- [ ] **8.6 — Insights Page Redesign**
+  - [ ] 8.6.1 — Redesign `templates/insights/index.html` to accommodate all new sections: "Forgotten Content" (auto-loaded), "What to Study Next" (button-triggered), "Topic Patterns" (button-triggered), "Weekly Summary" (button-triggered), "Generate Insights" (existing), and the AI Chat panel.
+  - [ ] 8.6.2 — Organize the page into two columns on desktop: left column for the data-driven AI cards (forgotten content, next study, topic patterns, weekly summary, insights); right column (or full-width below) for the AI Chat.
+  - [ ] 8.6.3 — Add a page intro section with a short description of what the Insights page offers.
 
 ---
 
-### Sprint 9: Bug Injection — QA Hackathon
+### Sprint 9: Testing
+
+> **Goal:** Add automated tests for critical functionality across all sprints, including the new AI features introduced in Sprint 8.
+
+- [ ] **9.1 — User Authentication Tests**
+  - [ ] 9.1.1 — Write tests in `users/tests.py` for: user registration with valid data succeeds, registration with duplicate email fails, registration with mismatched passwords fails
+  - [ ] 9.1.2 — Write tests for: login with correct email/password succeeds, login with wrong password fails, login with non-existent email fails
+  - [ ] 9.1.3 — Write tests for: authenticated user can access dashboard, unauthenticated user is redirected to login
+  - [ ] 9.1.4 — Write tests for: AI settings form saves `ai_provider` and `ai_api_key` correctly, blank key submission preserves existing key
+
+- [ ] **9.2 — Content CRUD Tests**
+  - [ ] 9.2.1 — Write tests in `contents/tests.py` for: creating content with valid data, creating content with missing required fields fails
+  - [ ] 9.2.2 — Write tests for: user can only see their own content, user cannot access another user's content detail/edit/delete
+  - [ ] 9.2.3 — Write tests for: content status update works correctly, content deletion works correctly
+  - [ ] 9.2.4 — Write tests for: content list filtering by status, type, and category returns correct results
+  - [ ] 9.2.5 — Write tests for: content list search returns correct results
+  - [ ] 9.2.6 — Write tests for: file upload accepts allowed extensions and rejects disallowed ones, file exceeding 10MB is rejected
+
+- [ ] **9.3 — Category & Tag Tests**
+  - [ ] 9.3.1 — Write tests in `categories/tests.py` for: category CRUD operations, user scoping (user A cannot see/edit user B's categories)
+  - [ ] 9.3.2 — Write tests in `tags/tests.py` for: tag CRUD operations, user scoping, duplicate tag name per user fails
+
+- [ ] **9.4 — Dashboard Tests**
+  - [ ] 9.4.1 — Write tests in `dashboard/tests.py` for: dashboard loads for authenticated user, stats are correctly calculated (create test data and verify counts)
+  - [ ] 9.4.2 — Write tests for: `DashboardService` returns correct `total_contents`, `by_status`, `by_type`, `top_categories`, `top_tags` for a user with known test data
+  - [ ] 9.4.3 — Write tests for: recently added and recently completed lists are user-scoped and ordered correctly
+
+- [ ] **9.5 — AI Service Tests (Original Features)**
+  - [ ] 9.5.1 — Write tests in `insights/tests.py` for: `SuggestCategoryView`, `GenerateDescriptionView`, `GenerateInsightsView` all require authentication (anonymous → 302)
+  - [ ] 9.5.2 — Write tests for: all three views return valid JSON on mocked AI success response
+  - [ ] 9.5.3 — Write tests for: `GenerateInsightsView` returns HTTP 503 when `AIService.generate_insights` returns `None` (mocked failure)
+  - [ ] 9.5.4 — Write tests for: `SuggestCategoryView` returns HTTP 400 when user has no categories
+
+- [ ] **9.6 — Advanced AI Feature Tests (Sprint 8)**
+  - [ ] 9.6.1 — Write tests for: `SuggestNextView` requires authentication, returns 200 with JSON on mocked success, returns 503 on mocked failure
+  - [ ] 9.6.2 — Write tests for: `ForgottenContentsView` requires authentication, returns only content with `status='new'` and `created_at` older than 30 days, returns empty list when no forgotten content exists
+  - [ ] 9.6.3 — Write tests for: `AnalyzeTopicsView` requires authentication, returns 200 with JSON on mocked success
+  - [ ] 9.6.4 — Write tests for: `WeeklySummaryView` requires authentication, returns 200 with JSON on mocked success
+  - [ ] 9.6.5 — Write tests for: `ChatView` requires authentication, accepts `{ "message": "...", "history": [] }`, returns `{ "reply": "..." }` on mocked success, returns error JSON on mocked failure
+  - [ ] 9.6.6 — Write tests for: `ChatView` rate limiting — after exceeding the daily session limit, subsequent requests return HTTP 429
+  - [ ] 9.6.7 — Write tests for: `build_user_context(user)` returns a non-empty string, includes the user's content count and category names
+
+---
+
+### Sprint 10: Bug Injection — QA Hackathon
 
 > **Goal:** Intentionally introduce 18 bugs across the application for a QA hackathon challenge. Participants must explore and test the application to discover and document these defects. Bugs span multiple severity levels (critical, major, minor, cosmetic) and multiple domains (auth, content, categories, tags, dashboard, AI, UI/UX) to reward diverse testing strategies.
 
-- [ ] **9.1 — Inject Bugs into the Application**
+- [ ] **10.1 — Inject Bugs into the Application**
 
-  - [ ] 9.1.1 — **Auth: Registration accepts passwords shorter than 8 characters.** Remove or bypass Django's `MinimumLengthValidator` in `AUTH_PASSWORD_VALIDATORS` settings so users can register with extremely short passwords like "123" without any validation error.
+  - [ ] 10.1.1 — **Auth: Registration accepts passwords shorter than 8 characters.** Remove or bypass Django's `MinimumLengthValidator` in `AUTH_PASSWORD_VALIDATORS` settings so users can register with extremely short passwords like "123" without any validation error.
 
-  - [ ] 9.1.2 — **Auth: Login error message reveals whether the email exists.** Modify the `EmailAuthenticationForm` or `CustomLoginView` to show "Password is incorrect" when the email exists but the password is wrong, and "Email not found" when the email doesn't exist. This is an information disclosure vulnerability — the default Django behavior uses a generic message, so the bug is introduced by replacing it with specific messages.
+  - [ ] 10.1.2 — **Auth: Login error message reveals whether the email exists.** Modify the `EmailAuthenticationForm` or `CustomLoginView` to show "Password is incorrect" when the email exists but the password is wrong, and "Email not found" when the email doesn't exist. This is an information disclosure vulnerability — the default Django behavior uses a generic message, so the bug is introduced by replacing it with specific messages.
 
-  - [ ] 9.1.3 — **Auth: After changing password, user session is not invalidated.** Modify `CustomPasswordChangeView` to skip calling `update_session_auth_hash()` after a successful password change, causing the user to be logged out unexpectedly after the redirect. The success message says "Password changed successfully" but the user is kicked to the login page.
+  - [ ] 10.1.3 — **Auth: After changing password, user session is not invalidated.** Modify `CustomPasswordChangeView` to skip calling `update_session_auth_hash()` after a successful password change, causing the user to be logged out unexpectedly after the redirect. The success message says "Password changed successfully" but the user is kicked to the login page.
 
-  - [ ] 9.1.4 — **Content: Creating content without a title silently saves with an empty title.** Remove the `required` constraint from the `title` field in `ContentForm` (set `required=False` and remove model-level blank validation or use `blank=True` on the model). The form submits successfully and the content list shows an empty-titled card.
+  - [ ] 10.1.4 — **Content: Creating content without a title silently saves with an empty title.** Remove the `required` constraint from the `title` field in `ContentForm` (set `required=False` and remove model-level blank validation or use `blank=True` on the model). The form submits successfully and the content list shows an empty-titled card.
 
-  - [ ] 9.1.5 — **Content: Status filter shows all content regardless of selected status.** In `ContentListView`, introduce a bug in the filter logic: when the `status` GET parameter is present, use `.exclude(status=status)` instead of `.filter(status=status)`. This inverts the results — selecting "Completed" shows everything except completed items.
+  - [ ] 10.1.5 — **Content: Status filter shows all content regardless of selected status.** In `ContentListView`, introduce a bug in the filter logic: when the `status` GET parameter is present, use `.exclude(status=status)` instead of `.filter(status=status)`. This inverts the results — selecting "Completed" shows everything except completed items.
 
-  - [ ] 9.1.6 — **Content: Editing content from another user is possible via direct URL manipulation.** In `ContentUpdateView`, remove the queryset filtering by `request.user` (remove the `get_queryset` override that limits to the logged-in user's content). Any authenticated user can now edit any content by navigating directly to `/contents/<other_user_content_id>/edit/`.
+  - [ ] 10.1.6 — **Content: Editing content from another user is possible via direct URL manipulation.** In `ContentUpdateView`, remove the queryset filtering by `request.user` (remove the `get_queryset` override that limits to the logged-in user's content). Any authenticated user can now edit any content by navigating directly to `/contents/<other_user_content_id>/edit/`.
 
-  - [ ] 9.1.7 — **Content: Sorting by "oldest first" still sorts by newest first.** In `ContentListView`, when the sort parameter is `oldest`, apply `.order_by('-created_at')` (descending) instead of `.order_by('created_at')` (ascending), making both "newest" and "oldest" sort options produce the same result.
+  - [ ] 10.1.7 — **Content: Sorting by "oldest first" still sorts by newest first.** In `ContentListView`, when the sort parameter is `oldest`, apply `.order_by('-created_at')` (descending) instead of `.order_by('created_at')` (ascending), making both "newest" and "oldest" sort options produce the same result.
 
-  - [ ] 9.1.8 — **Content: Quick status change to "Completed" sets the status to "In Progress" instead.** In `ContentStatusUpdateView`, introduce a mapping bug: when the received status value is `completed`, save it as `in_progress` instead. The user clicks "Mark as Completed" but the badge changes to "In Progress".
+  - [ ] 10.1.8 — **Content: Quick status change to "Completed" sets the status to "In Progress" instead.** In `ContentStatusUpdateView`, introduce a mapping bug: when the received status value is `completed`, save it as `in_progress` instead. The user clicks "Mark as Completed" but the badge changes to "In Progress".
 
-  - [ ] 9.1.9 — **Content: Pagination shows wrong total count on filtered results.** In `ContentListView`, compute the `total_count` context variable using the unfiltered queryset (`Content.objects.filter(user=request.user).count()`) instead of the filtered queryset's count. When filters are active, the header says "Showing 47 contents" even though only 3 are displayed on the page.
+  - [ ] 10.1.9 — **Content: Pagination shows wrong total count on filtered results.** In `ContentListView`, compute the `total_count` context variable using the unfiltered queryset (`Content.objects.filter(user=request.user).count()`) instead of the filtered queryset's count. When filters are active, the header says "Showing 47 contents" even though only 3 are displayed on the page.
 
-  - [ ] 9.1.10 — **Categories: Deleting a category also deletes all content in that category.** On the `Category` model's `user` ForeignKey (or the Content model's `category` ForeignKey), change `on_delete=models.SET_NULL` to `on_delete=models.CASCADE`. When a user deletes a category, all content associated with that category is silently deleted instead of having its category set to null.
+  - [ ] 10.1.10 — **Categories: Deleting a category also deletes all content in that category.** On the `Category` model's `user` ForeignKey (or the Content model's `category` ForeignKey), change `on_delete=models.SET_NULL` to `on_delete=models.CASCADE`. When a user deletes a category, all content associated with that category is silently deleted instead of having its category set to null.
 
-  - [ ] 9.1.11 — **Categories: Duplicate category names are allowed for the same user.** Remove the `unique_together = ['name', 'user']` constraint from the `Category` model's `Meta` class. Users can now create multiple categories with identical names, causing confusion in filters and dropdowns.
+  - [ ] 10.1.11 — **Categories: Duplicate category names are allowed for the same user.** Remove the `unique_together = ['name', 'user']` constraint from the `Category` model's `Meta` class. Users can now create multiple categories with identical names, causing confusion in filters and dropdowns.
 
-  - [ ] 9.1.12 — **Tags: Tag content count on the tag list page always shows 0.** In `TagListView`, introduce a bug in the annotation: use `Count('id')` instead of `Count('content')` (or reference a wrong related name), so the content count annotation always returns 0 for every tag regardless of how many contents are actually tagged.
+  - [ ] 10.1.12 — **Tags: Tag content count on the tag list page always shows 0.** In `TagListView`, introduce a bug in the annotation: use `Count('id')` instead of `Count('content')` (or reference a wrong related name), so the content count annotation always returns 0 for every tag regardless of how many contents are actually tagged.
 
-  - [ ] 9.1.13 — **Tags: Deleting a tag does not remove it from associated content items.** Override the `Tag.delete()` method (or the `TagDeleteView`) to call `self.content_set.clear()` **after** `super().delete()` — since the tag is already deleted, the clear does nothing and orphan references remain. Alternatively, skip the M2M cleanup entirely so the through-table retains stale entries. This manifests as ghost tag badges on content detail pages that link to a 404.
+  - [ ] 10.1.13 — **Tags: Deleting a tag does not remove it from associated content items.** Override the `Tag.delete()` method (or the `TagDeleteView`) to call `self.content_set.clear()` **after** `super().delete()` — since the tag is already deleted, the clear does nothing and orphan references remain. Alternatively, skip the M2M cleanup entirely so the through-table retains stale entries. This manifests as ghost tag badges on content detail pages that link to a 404.
 
-  - [ ] 9.1.14 — **Dashboard: "Recently Completed" section shows recently added items instead.** In `DashboardService`, for the "recently completed" query, use `.order_by('-created_at')` instead of `.order_by('-updated_at')` and omit the `.filter(status='completed')`. This returns the most recently created items regardless of status, identical to the "Recently Added" section.
+  - [ ] 10.1.14 — **Dashboard: "Recently Completed" section shows recently added items instead.** In `DashboardService`, for the "recently completed" query, use `.order_by('-created_at')` instead of `.order_by('-updated_at')` and omit the `.filter(status='completed')`. This returns the most recently created items regardless of status, identical to the "Recently Added" section.
 
-  - [ ] 9.1.15 — **Dashboard: Total content count includes content from all users.** In `DashboardService`, compute the total count with `Content.objects.count()` instead of `Content.objects.filter(user=user).count()`. On a multi-user instance, the total stat is inflated with other users' content while the per-status breakdown is correct (user-scoped), creating a mismatch.
+  - [ ] 10.1.15 — **Dashboard: Total content count includes content from all users.** In `DashboardService`, compute the total count with `Content.objects.count()` instead of `Content.objects.filter(user=user).count()`. On a multi-user instance, the total stat is inflated with other users' content while the per-status breakdown is correct (user-scoped), creating a mismatch.
 
-  - [ ] 9.1.16 — **AI: "Generate Description" button populates the title field instead of the description field.** In the JavaScript on `content_form.html`, the AJAX success handler for the "Generate Description" button targets `#id_title` instead of `#id_description`, overwriting the user's title with the AI-generated description text.
+  - [ ] 10.1.16 — **AI: "Generate Description" button populates the title field instead of the description field.** In the JavaScript on `content_form.html`, the AJAX success handler for the "Generate Description" button targets `#id_title` instead of `#id_description`, overwriting the user's title with the AI-generated description text.
 
-  - [ ] 9.1.17 — **UI: Flash success message appears with error styling (red) on content creation.** In the `ContentCreateView`, use `messages.error()` instead of `messages.success()` when content is created. The message text says "Content created successfully!" but it renders with the red/danger color scheme, confusing the user.
+  - [ ] 10.1.17 — **UI: Flash success message appears with error styling (red) on content creation.** In the `ContentCreateView`, use `messages.error()` instead of `messages.success()` when content is created. The message text says "Content created successfully!" but it renders with the red/danger color scheme, confusing the user.
 
-  - [ ] 9.1.18 — **UI: Sidebar "Contents" link points to the categories page.** In `templates/components/sidebar.html`, set the `href` of the "Contents" navigation item to `{% url 'categories:list' %}` instead of `{% url 'contents:list' %}`. The icon and label say "Contents" but clicking it navigates to the categories page.
+  - [ ] 10.1.18 — **UI: Sidebar "Contents" link points to the categories page.** In `templates/components/sidebar.html`, set the `href` of the "Contents" navigation item to `{% url 'categories:list' %}` instead of `{% url 'contents:list' %}`. The icon and label say "Contents" but clicking it navigates to the categories page.
 
-  - [ ] 9.1.19 — **AI: "Suggest Category" returns a category that does not belong to the user.** In `AIService.suggest_category`, pass the full list of all categories from the database (`Category.objects.all()`) instead of only the user's categories (`Category.objects.filter(user=user)`) to the AI prompt. The AI may suggest a category name that belongs to another user. When the AJAX success handler tries to match and select it in the dropdown, it either selects nothing (silent failure) or, if the frontend creates the option dynamically, saves the content with a reference to another user's category.
+  - [ ] 10.1.19 — **AI: "Suggest Category" returns a category that does not belong to the user.** In `AIService.suggest_category`, pass the full list of all categories from the database (`Category.objects.all()`) instead of only the user's categories (`Category.objects.filter(user=user)`) to the AI prompt. The AI may suggest a category name that belongs to another user. When the AJAX success handler tries to match and select it in the dropdown, it either selects nothing (silent failure) or, if the frontend creates the option dynamically, saves the content with a reference to another user's category.
 
-  - [ ] 9.1.20 — **AI: "Generate Insights" displays the raw markdown/HTML response without sanitization.** In `GenerateInsightsView`, return the AI-generated text and inject it into the DOM using `innerHTML` (in the JavaScript handler) without any sanitization or escaping. Additionally, modify the AI prompt in `AIService.generate_insights` to instruct the model to format the response with HTML tags (`<h3>`, `<ul>`, `<strong>`, etc.). Since the response is rendered unsanitized, if a user manages to influence the AI output (e.g., by having content titles with `<script>` tags), the raw HTML/script is rendered in the insights panel — a stored XSS vector.
+  - [ ] 10.1.20 — **AI: "Generate Insights" displays the raw markdown/HTML response without sanitization.** In `GenerateInsightsView`, return the AI-generated text and inject it into the DOM using `innerHTML` (in the JavaScript handler) without any sanitization or escaping. Additionally, modify the AI prompt in `AIService.generate_insights` to instruct the model to format the response with HTML tags (`<h3>`, `<ul>`, `<strong>`, etc.). Since the response is rendered unsanitized, if a user manages to influence the AI output (e.g., by having content titles with `<script>` tags), the raw HTML/script is rendered in the insights panel — a stored XSS vector.
 
-- [ ] **9.2 — Manual Verification of Injected Bugs**
+- [ ] **10.2 — Manual Verification of Injected Bugs**
 
-  - [ ] 9.2.1 — Create two test user accounts (e.g., `tester1@studyhub.com` and `tester2@studyhub.com`) with sample data: at least 15 content items each across different types, statuses, categories, and tags
-  - [ ] 9.2.2 — Verify bug 9.1.1: attempt registration with a 2-character password → registration succeeds (should have been rejected)
-  - [ ] 9.2.3 — Verify bug 9.1.2: attempt login with existing email + wrong password, then with non-existent email → different error messages are shown (should be the same generic message)
-  - [ ] 9.2.4 — Verify bug 9.1.3: log in, change password, observe redirect → user is logged out and sent to login page instead of staying on the dashboard
-  - [ ] 9.2.5 — Verify bug 9.1.4: create content leaving the title field empty → form submits and saves an untitled content item
-  - [ ] 9.2.6 — Verify bug 9.1.5: apply "Completed" status filter on the content list → results show everything except completed items
-  - [ ] 9.2.7 — Verify bug 9.1.6: log in as tester1, note the edit URL of one of tester1's content items (e.g., `/contents/5/edit/`). Log in as tester2, navigate directly to that URL → tester1's content is editable by tester2
-  - [ ] 9.2.8 — Verify bug 9.1.7: sort content list by "oldest first" → results are in the same order as "newest first"
-  - [ ] 9.2.9 — Verify bug 9.1.8: click "Mark as Completed" on a content item → status changes to "In Progress" instead
-  - [ ] 9.2.10 — Verify bug 9.1.9: apply a filter that returns few results → total count in the header still shows the unfiltered total
-  - [ ] 9.2.11 — Verify bug 9.1.10: create a category with content, delete the category → all content in that category is also deleted
-  - [ ] 9.2.12 — Verify bug 9.1.11: create two categories with the exact same name → both are saved without error
-  - [ ] 9.2.13 — Verify bug 9.1.12: view the tag list page → all tags show "0 contents" even those with tagged content
-  - [ ] 9.2.14 — Verify bug 9.1.13: delete a tag that is assigned to content → content detail still shows the deleted tag as a broken badge/link
-  - [ ] 9.2.15 — Verify bug 9.1.14: mark several items as completed → "Recently Completed" section shows recently created items regardless of status
-  - [ ] 9.2.16 — Verify bug 9.1.15: log in as tester1 → total content count on the dashboard includes tester2's items
-  - [ ] 9.2.17 — Verify bug 9.1.16: on the content form, enter a title, click "Generate Description" → title field is overwritten with the AI description
-  - [ ] 9.2.18 — Verify bug 9.1.17: create new content → flash message says "Content created successfully!" but appears in red/danger styling
-  - [ ] 9.2.19 — Verify bug 9.1.18: click "Contents" in the sidebar → user is navigated to the categories page instead
-  - [ ] 9.2.20 — Verify bug 9.1.19: as tester1, create categories "AI" and "Career". As tester2, create categories "DevOps" and "Security". Log in as tester1, add new content with title "Kubernetes Best Practices", click "AI Suggest Category" → AI may suggest "DevOps" (tester2's category), which either fails to select in the dropdown or creates an invalid association
-  - [ ] 9.2.21 — Verify bug 9.1.20: create a content item with title `<img src=x onerror=alert('XSS')>`. Navigate to the dashboard, click "Generate Insights" → the insights panel renders unsanitized HTML and the injected script/tag executes or renders in the browser
+  - [ ] 10.2.1 — Create two test user accounts (e.g., `tester1@studyhub.com` and `tester2@studyhub.com`) with sample data: at least 15 content items each across different types, statuses, categories, and tags
+  - [ ] 10.2.2 — Verify bug 10.1.1: attempt registration with a 2-character password → registration succeeds (should have been rejected)
+  - [ ] 10.2.3 — Verify bug 10.1.2: attempt login with existing email + wrong password, then with non-existent email → different error messages are shown (should be the same generic message)
+  - [ ] 10.2.4 — Verify bug 10.1.3: log in, change password, observe redirect → user is logged out and sent to login page instead of staying on the dashboard
+  - [ ] 10.2.5 — Verify bug 10.1.4: create content leaving the title field empty → form submits and saves an untitled content item
+  - [ ] 10.2.6 — Verify bug 10.1.5: apply "Completed" status filter on the content list → results show everything except completed items
+  - [ ] 10.2.7 — Verify bug 10.1.6: log in as tester1, note the edit URL of one of tester1's content items (e.g., `/contents/5/edit/`). Log in as tester2, navigate directly to that URL → tester1's content is editable by tester2
+  - [ ] 10.2.8 — Verify bug 10.1.7: sort content list by "oldest first" → results are in the same order as "newest first"
+  - [ ] 10.2.9 — Verify bug 10.1.8: click "Mark as Completed" on a content item → status changes to "In Progress" instead
+  - [ ] 10.2.10 — Verify bug 10.1.9: apply a filter that returns few results → total count in the header still shows the unfiltered total
+  - [ ] 10.2.11 — Verify bug 10.1.10: create a category with content, delete the category → all content in that category is also deleted
+  - [ ] 10.2.12 — Verify bug 10.1.11: create two categories with the exact same name → both are saved without error
+  - [ ] 10.2.13 — Verify bug 10.1.12: view the tag list page → all tags show "0 contents" even those with tagged content
+  - [ ] 10.2.14 — Verify bug 10.1.13: delete a tag that is assigned to content → content detail still shows the deleted tag as a broken badge/link
+  - [ ] 10.2.15 — Verify bug 10.1.14: mark several items as completed → "Recently Completed" section shows recently created items regardless of status
+  - [ ] 10.2.16 — Verify bug 10.1.15: log in as tester1 → total content count on the dashboard includes tester2's items
+  - [ ] 10.2.17 — Verify bug 10.1.16: on the content form, enter a title, click "Generate Description" → title field is overwritten with the AI description
+  - [ ] 10.2.18 — Verify bug 10.1.17: create new content → flash message says "Content created successfully!" but appears in red/danger styling
+  - [ ] 10.2.19 — Verify bug 10.1.18: click "Contents" in the sidebar → user is navigated to the categories page instead
+  - [ ] 10.2.20 — Verify bug 10.1.19: as tester1, create categories "AI" and "Career". As tester2, create categories "DevOps" and "Security". Log in as tester1, add new content with title "Kubernetes Best Practices", click "AI Suggest Category" → AI may suggest "DevOps" (tester2's category), which either fails to select in the dropdown or creates an invalid association
+  - [ ] 10.2.21 — Verify bug 10.1.20: create a content item with title `<img src=x onerror=alert('XSS')>`. Navigate to the dashboard, click "Generate Insights" → the insights panel renders unsanitized HTML and the injected script/tag executes or renders in the browser
+
 ---
 
-### Sprint 10: Deployment Preparation
+### Sprint 11: Deployment Preparation
 
 > **Goal:** Prepare the project for production deployment with Docker and final configurations.
 
-- [ ] **10.1 — Requirements & Dependencies**
-  - [ ] 10.1.1 — Create `requirements.txt` with all project dependencies and pinned versions (Django, anthropic, gunicorn, etc.)
-  - [ ] 10.1.2 — Create `.env.example` with all required environment variables: `SECRET_KEY`, `DEBUG`, `ANTHROPIC_API_KEY`, `ALLOWED_HOSTS`
-  - [ ] 10.1.3 — Update `core/settings.py` to read all sensitive settings from environment variables using `os.environ`
+- [ ] **11.1 — Requirements & Dependencies**
+  - [ ] 11.1.1 — Create `requirements.txt` with all project dependencies and pinned versions (Django, anthropic, gunicorn, etc.)
+  - [ ] 11.1.2 — Create `.env.example` with all required environment variables: `SECRET_KEY`, `DEBUG`, `ANTHROPIC_API_KEY`, `ALLOWED_HOSTS`
+  - [ ] 11.1.3 — Update `core/settings.py` to read all sensitive settings from environment variables using `os.environ`
 
-- [ ] **10.2 — Docker Setup**
-  - [ ] 10.2.1 — Create `Dockerfile`: Python 3.13 slim image, install dependencies, copy project, collect static files, expose port 8000, run with gunicorn
-  - [ ] 10.2.2 — Create `docker-compose.yml`: single service for the Django app, volume for SQLite database, environment variables from `.env` file
-  - [ ] 10.2.3 — Create `.dockerignore`: exclude `.git`, `__pycache__`, `*.pyc`, `.env`, `db.sqlite3`, `node_modules`
+- [ ] **11.2 — Docker Setup**
+  - [ ] 11.2.1 — Create `Dockerfile`: Python 3.13 slim image, install dependencies, copy project, collect static files, expose port 8000, run with gunicorn
+  - [ ] 11.2.2 — Create `docker-compose.yml`: single service for the Django app, volume for SQLite database, environment variables from `.env` file
+  - [ ] 11.2.3 — Create `.dockerignore`: exclude `.git`, `__pycache__`, `*.pyc`, `.env`, `db.sqlite3`, `node_modules`
 
-- [ ] **10.3 — Static Files & Production Settings**
-  - [ ] 10.3.1 — Configure `STATIC_ROOT` and run `collectstatic`
-  - [ ] 10.3.2 — Add `whitenoise` middleware for serving static files in production
-  - [ ] 10.3.3 — Set `DEBUG = False` handling, configure `ALLOWED_HOSTS` from environment
+- [ ] **11.3 — Static Files & Production Settings**
+  - [ ] 11.3.1 — Configure `STATIC_ROOT` and run `collectstatic`
+  - [ ] 11.3.2 — Add `whitenoise` middleware for serving static files in production
+  - [ ] 11.3.3 — Set `DEBUG = False` handling, configure `ALLOWED_HOSTS` from environment
 
-- [ ] **10.4 — Documentation**
-  - [ ] 10.4.1 — Create `README.md` with: project description, features list, tech stack, setup instructions (local and Docker), environment variables reference, and screenshots placeholder
-  - [ ] 10.4.2 — Add inline code comments to complex views and services
-  - [ ] 10.4.3 — Create `CHANGELOG.md` with version 1.0 release notes
+- [ ] **11.4 — Documentation**
+  - [ ] 11.4.1 — Create `README.md` with: project description, features list, tech stack, setup instructions (local and Docker), environment variables reference, and screenshots placeholder
+  - [ ] 11.4.2 — Add inline code comments to complex views and services
+  - [ ] 11.4.3 — Create `CHANGELOG.md` with version 1.0 release notes

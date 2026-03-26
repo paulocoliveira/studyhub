@@ -9,8 +9,8 @@
 
     <!-- Page header -->
     <div class='mb-8'>
-        <h2 class='text-3xl font-bold text-gray-100'>AI Settings</h2>
-        <p class='mt-1 text-sm text-gray-400'>Configure your AI provider and API key for AI-powered features.</p>
+        <h2 class='text-3xl font-bold text-white'>AI Settings</h2>
+        <p class='mt-1 text-sm text-zinc-400'>Configure your AI provider and API key for AI-powered features.</p>
     </div>
 
     <!-- Success message -->
@@ -23,7 +23,7 @@
     {% endif %}
 
     <!-- Card -->
-    <div class='bg-gray-900 border border-gray-800 rounded-xl p-6'>
+    <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-6'>
 
         <!-- Non-field errors -->
         {% if form.non_field_errors %}
@@ -41,7 +41,7 @@
 
                 <!-- AI Provider -->
                 <div>
-                    <label for='{{ form.ai_provider.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1'>
+                    <label for='{{ form.ai_provider.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1'>
                         AI Provider
                     </label>
                     {{ form.ai_provider }}
@@ -52,7 +52,7 @@
 
                 <!-- API Key -->
                 <div>
-                    <label for='{{ form.ai_api_key.id_for_label }}' class='block text-sm font-medium text-gray-400 mb-1'>
+                    <label for='{{ form.ai_api_key.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1'>
                         API Key
                     </label>
                     {{ form.ai_api_key }}
@@ -60,7 +60,7 @@
                     <p class='mt-1 text-xs text-rose-500' role='alert'>{{ error }}</p>
                     {% endfor %}
                     {% if form.ai_api_key.help_text %}
-                    <p class='mt-1 text-xs text-gray-500'>{{ form.ai_api_key.help_text }}</p>
+                    <p class='mt-1 text-xs text-zinc-600'>{{ form.ai_api_key.help_text }}</p>
                     {% endif %}
                     {% if request.user.ai_api_key %}
                     <p class='mt-1 text-xs text-emerald-500'>A key is currently saved. Submit a new value to replace it, or leave blank to keep the existing key.</p>
@@ -70,16 +70,16 @@
                 <!-- Actions -->
                 <div class='flex items-center gap-3 pt-1'>
                     <button type='submit'
-                        class='px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600
+                        class='px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600
                         text-white text-sm font-semibold rounded-lg
-                        hover:from-violet-500 hover:to-indigo-500
-                        focus:outline-none focus:ring-2 focus:ring-violet-500/50
-                        transition-all duration-200 shadow-lg shadow-violet-500/25'>
+                        hover:from-green-500 hover:to-emerald-500
+                        focus:outline-none focus:ring-2 focus:ring-green-500/40
+                        transition-all duration-200 shadow-lg shadow-green-500/20'>
                         Save settings
                     </button>
                     <a href='{% url "dashboard:home" %}'
-                        class='px-5 py-2.5 bg-gray-800 text-gray-300 text-sm font-medium rounded-lg
-                        border border-gray-700 hover:bg-gray-700 hover:text-white
+                        class='px-5 py-2.5 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-lg
+                        border border-zinc-700 hover:bg-zinc-700 hover:text-white
                         transition-all duration-200'>
                         Cancel
                     </a>
@@ -91,11 +91,11 @@
     </div>
 
     <!-- Info box -->
-    <div class='mt-6 px-4 py-4 rounded-lg bg-gray-900 border border-gray-800'>
-        <h3 class='text-sm font-semibold text-gray-300 mb-2'>Where to get your API key</h3>
-        <ul class='text-xs text-gray-400 space-y-1 list-disc list-inside'>
-            <li><strong class='text-gray-300'>Anthropic (Claude):</strong> <a href='https://console.anthropic.com/' target='_blank' rel='noopener noreferrer' class='text-violet-400 hover:underline'>console.anthropic.com</a></li>
-            <li><strong class='text-gray-300'>OpenAI (GPT):</strong> <a href='https://platform.openai.com/api-keys' target='_blank' rel='noopener noreferrer' class='text-violet-400 hover:underline'>platform.openai.com/api-keys</a></li>
+    <div class='mt-6 px-4 py-4 rounded-lg bg-zinc-900 border border-zinc-800'>
+        <h3 class='text-sm font-semibold text-zinc-100 mb-2'>Where to get your API key</h3>
+        <ul class='text-xs text-zinc-400 space-y-1 list-disc list-inside'>
+            <li><strong class='text-zinc-200'>Anthropic (Claude):</strong> <a href='https://console.anthropic.com/' target='_blank' rel='noopener noreferrer' class='text-green-400 hover:underline'>console.anthropic.com</a></li>
+            <li><strong class='text-zinc-200'>OpenAI (GPT):</strong> <a href='https://platform.openai.com/api-keys' target='_blank' rel='noopener noreferrer' class='text-green-400 hover:underline'>platform.openai.com/api-keys</a></li>
         </ul>
     </div>
 
