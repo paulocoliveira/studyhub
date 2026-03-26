@@ -59,20 +59,7 @@
 
             <div class='flex flex-col gap-5'>
 
-                {# Title #}
-                <div>
-                    <label for='{{ form.title.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1.5'>
-                        Title <span class='text-rose-400'>*</span>
-                    </label>
-                    {{ form.title }}
-                    {% if form.title.errors %}
-                    {% for error in form.title.errors %}
-                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
-                    {% endfor %}
-                    {% endif %}
-                </div>
-
-                {# URL #}
+                {# URL — first so metadata fetch can auto-fill title #}
                 <div>
                     <label for='{{ form.url.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1.5'>
                         URL
@@ -88,6 +75,19 @@
                     {% endif %}
                     {% if form.url.errors %}
                     {% for error in form.url.errors %}
+                    <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Title #}
+                <div>
+                    <label for='{{ form.title.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1.5'>
+                        Title <span class='text-rose-400'>*</span>
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    {% for error in form.title.errors %}
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
                     {% endfor %}
                     {% endif %}
@@ -119,10 +119,11 @@
                     </div>
                 </div>
 
-                {# Category #}
+                {# Category — auto-suggested by AI, user can override #}
                 <div>
                     <label for='{{ form.category.id_for_label }}' class='block text-sm font-medium text-zinc-400 mb-1.5'>
                         Category
+                        <span id='category-ai-indicator' class='hidden ml-2 text-xs text-green-500/70 font-normal'>✨ AI suggested</span>
                     </label>
                     {{ form.category }}
                     {% if form.category.errors %}
@@ -130,14 +131,6 @@
                     <p class='mt-1 text-xs text-red-400'>{{ error }}</p>
                     {% endfor %}
                     {% endif %}
-                    <div class='mt-2'>
-                        <button type='button'
-                            id='btn-suggest-category'
-                            data-url='{% url "insights:suggest_category" %}'
-                            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed'>
-                            ✨ AI Suggest
-                        </button>
-                    </div>
                 </div>
 
                 {# Description #}
@@ -292,27 +285,50 @@
         setTimeout(function() { err.remove(); }, 5000);
     }
 
-    // Suggest Category
-    document.getElementById('btn-suggest-category')?.addEventListener('click', function() {
-        const title = document.getElementById('id_title')?.value || '';
-        const url = document.getElementById('id_url')?.value || '';
-        const endpoint = this.dataset.url;
-
-        aiRequest(endpoint, 'POST', {title: title, url: url}, this, function(data) {
-            const select = document.getElementById('id_category');
-            if (select && data.category) {
-                const target = data.category.trim().toLowerCase();
-                for (const opt of select.options) {
-                    if (opt.text.trim().toLowerCase() === target) {
-                        select.value = opt.value;
+    // Auto-suggest category silently (no button)
+    var suggestCategoryEndpoint = '{% url "insights:suggest_category" %}';
+    function autoSuggestCategory() {
+        var title = document.getElementById('id_title')?.value || '';
+        if (!title.trim()) return;
+        var select = document.getElementById('id_category');
+        // Don't override an existing user selection
+        if (select && select.value) return;
+        var url = document.getElementById('id_url')?.value || '';
+        fetch(suggestCategoryEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({title: title, url: url}),
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success && data.category && select && !select.value) {
+                var target = data.category.trim().toLowerCase();
+                for (var i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text.trim().toLowerCase() === target) {
+                        select.value = select.options[i].value;
+                        var indicator = document.getElementById('category-ai-indicator');
+                        if (indicator) indicator.classList.remove('hidden');
                         break;
                     }
                 }
             }
-        });
+        })
+        .catch(function() {});
+    }
+
+    // Hide AI indicator when user manually changes category
+    document.getElementById('id_category')?.addEventListener('change', function() {
+        var indicator = document.getElementById('category-ai-indicator');
+        if (indicator) indicator.classList.add('hidden');
     });
 
-    // Fetch URL metadata on blur — populate title/description if empty
+    // Auto-suggest on title blur
+    document.getElementById('id_title')?.addEventListener('blur', autoSuggestCategory);
+
+    // Fetch URL metadata on blur — populate title/description if empty, then auto-suggest category
     (function() {
         var urlInput = document.getElementById('id_url');
         if (!urlInput) return;
@@ -354,6 +370,8 @@
                 if (needsDesc && data.description && descField && !descField.value.trim()) {
                     descField.value = data.description;
                 }
+                // After filling title from metadata, auto-suggest category
+                autoSuggestCategory();
             })
             .catch(function() { indicator.remove(); });
         });

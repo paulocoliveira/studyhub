@@ -67,6 +67,10 @@
                     {{ filter_form.category }}
                 </div>
 
+                {# Preserve sort and show_completed across filter submissions #}
+                <input type='hidden' name='sort' value='{{ request.GET.sort|default:"-created_at" }}'>
+                <input type='hidden' name='show_completed' value='{{ request.GET.show_completed|default:"0" }}'>
+
                 {# Submit #}
                 <button type='submit'
                     class='px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600
@@ -79,10 +83,10 @@
 
             </div>
 
-            {# Clear filters link #}
-            {% if request.GET %}
+            {# Clear filters link — only shown when actual filters are active #}
+            {% if request.GET.search or request.GET.status or request.GET.content_type or request.GET.category %}
             <div class='mt-3 pt-3 border-t border-zinc-800'>
-                <a href='{% url "contents:list" %}'
+                <a href='{% url "contents:list" %}?sort={{ request.GET.sort|default:"-created_at" }}&show_completed={{ request.GET.show_completed|default:"0" }}'
                     class='inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-300 transition-colors duration-200'>
                     <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
                         <line x1='18' y1='6' x2='6' y2='18'/>
@@ -95,13 +99,55 @@
         </div>
     </form>
 
-    {# View toggle #}
+    {# View toggle + hide-completed toggle #}
     <div class='flex items-center justify-between mb-4'>
         <p class='text-sm text-zinc-600'>
             {% if page_obj %}
                 Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ paginator.count }} item{{ paginator.count|pluralize }}
+                {% if request.GET.show_completed != '1' %}
+                <span class='text-zinc-700'>· completed hidden</span>
+                {% endif %}
             {% endif %}
         </p>
+        <div class='flex items-center gap-2'>
+
+        {# Sort select — outside filter form, navigates via JS #}
+        <div>
+            <label for='id_sort_toolbar' class='sr-only'>Sort by</label>
+            <select id='id_sort_toolbar'
+                class='bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-300 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 cursor-pointer'>
+                <option value='-created_at' {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Newest first</option>
+                <option value='created_at' {% if request.GET.sort == 'created_at' %}selected{% endif %}>Oldest first</option>
+                <option value='title' {% if request.GET.sort == 'title' %}selected{% endif %}>Title A–Z</option>
+                <option value='-title' {% if request.GET.sort == '-title' %}selected{% endif %}>Title Z–A</option>
+                <option value='category__name' {% if request.GET.sort == 'category__name' %}selected{% endif %}>Category</option>
+            </select>
+        </div>
+
+        {# Hide completed toggle #}
+        {% if request.GET.show_completed == '1' %}
+        <button type='button' id='btn-toggle-completed' data-show='1'
+            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg
+                bg-zinc-700 text-zinc-300 hover:bg-zinc-600 transition-all duration-200'
+            title='Click to hide completed contents'>
+            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/>
+            </svg>
+            Showing completed
+        </button>
+        {% else %}
+        <button type='button' id='btn-toggle-completed' data-show='0'
+            class='inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg
+                bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-200'
+            title='Click to show completed contents'>
+            <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24'/>
+                <line x1='1' y1='1' x2='23' y2='23'/>
+            </svg>
+            Completed hidden
+        </button>
+        {% endif %}
+
         <div class='flex items-center gap-1 bg-zinc-800/60 rounded-lg p-0.5' role='group' aria-label='View toggle'>
             <button id='btn-view-cards' data-view='cards' type='button'
                 class='p-1.5 rounded-md transition-all duration-200'
@@ -128,6 +174,8 @@
                 </svg>
             </button>
         </div>
+
+        </div>{# end flex items-center gap-2 #}
     </div>
 
     {% if contents %}
@@ -290,6 +338,35 @@
 
 {% block scripts %}
 <script>
+// Hide/show completed toggle
+(function () {
+    var btn = document.getElementById('btn-toggle-completed');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var url = new URL(window.location.href);
+        var params = url.searchParams;
+        if (params.get('show_completed') === '1') {
+            params.delete('show_completed');
+        } else {
+            params.set('show_completed', '1');
+        }
+        params.delete('page');
+        window.location.href = url.toString();
+    });
+}());
+
+// Sort select — navigate preserving all current params
+(function () {
+    var sortSelect = document.getElementById('id_sort_toolbar');
+    if (!sortSelect) return;
+    sortSelect.addEventListener('change', function () {
+        var url = new URL(window.location.href);
+        url.searchParams.set('sort', this.value);
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    });
+}());
+
 (function () {
     var STORAGE_KEY = 'studyhub_content_view';
     var cardView = document.getElementById('view-cards-container');

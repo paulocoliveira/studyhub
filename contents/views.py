@@ -2,7 +2,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -19,7 +19,7 @@ from .forms import ContentFilterForm, ContentForm
 from .models import STATUS_CHOICES, Content
 from .services import LinkPreviewService
 
-ALLOWED_SORT_FIELDS = ['title', '-title', 'status', 'created_at', '-created_at']
+ALLOWED_SORT_FIELDS = ['title', '-title', 'status', 'created_at', '-created_at', 'category__name']
 
 
 class ContentListView(LoginRequiredMixin, ListView):
@@ -53,10 +53,26 @@ class ContentListView(LoginRequiredMixin, ListView):
         if tag:
             qs = qs.filter(tags__id=tag)
 
+        # Hide completed by default unless show_completed=1 or explicit status filter
+        show_completed = self.request.GET.get('show_completed', '0')
+        if show_completed != '1' and not status:
+            qs = qs.exclude(status='completed')
+
         sort = self.request.GET.get('sort', '-created_at').strip()
         if sort not in ALLOWED_SORT_FIELDS:
             sort = '-created_at'
-        qs = qs.order_by(sort)
+        if sort == 'category__name':
+            qs = qs.order_by(
+                Case(
+                    When(category__isnull=True, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+                'category__name',
+                'title',
+            )
+        else:
+            qs = qs.order_by(sort)
 
         return qs
 
@@ -66,6 +82,8 @@ class ContentListView(LoginRequiredMixin, ListView):
             self.request.GET or None,
             user=self.request.user,
         )
+        # Save current query string so the detail view can restore it on back
+        self.request.session['contents_list_query'] = self.request.GET.urlencode()
         return context
 
 
@@ -76,6 +94,15 @@ class ContentDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return Content.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        saved_query = self.request.session.get('contents_list_query', '')
+        list_url = reverse('contents:list')
+        if saved_query:
+            list_url = f'{list_url}?{saved_query}'
+        context['back_to_list_url'] = list_url
+        return context
 
 
 class ContentCreateView(LoginRequiredMixin, CreateView):
