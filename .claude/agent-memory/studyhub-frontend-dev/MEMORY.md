@@ -6,3 +6,4 @@
 - [Sprint 5 template structure](project_sprint5_templates.md) — AI Insights panel, content form AI buttons, AJAX wiring, dashboard Row 5
 - [Sprint 6 template structure](project_sprint6_templates.md) — Responsive sidebar (md: breakpoint), flash auto-dismiss, breadcrumbs, dashboard onboarding, URL auto-detect
 - [Sprint 7 green theme](project_sprint7_theme.md) — Full gray/violet→green palette migration, dashboard clickable filters, landing page StudyHub h1
+- [Sprint 8 Insights redesign](project_sprint8_insights.md) — Two-column layout, five AI cards, AI chat panel, setupAiCard helper, generate-insights GET quirk

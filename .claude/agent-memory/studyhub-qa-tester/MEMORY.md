@@ -6,4 +6,5 @@
 - [Sprint 5 QA findings](project_sprint5.md) — BUG-01 Medium: GenerateInsightsView returns 200 success:True when API key missing; 17/20 pass
 - [Sprint 6 QA findings](project_sprint6.md) — BUG-01 Medium: no client-side JS validation despite novalidate; BUG-02 Medium: blue/yellow/green badge regression; 21/25 pass
 - [Sprint 7 QA findings](project_sprint7.md) — BUG-01 High: view toggle broken (JS getElementById targets wrong IDs); BUG-02 Medium: red/rose video badge still in detail/list; 22/25 pass
+- [Sprint 8 QA findings](project_sprint8.md) — BUG-01 Medium: self-XSS via item.title in innerHTML (forgotten content list); BUG-02/03 Low: _render_markdown bullet list missing <ul>, greedy ol regex; 23/28 pass
 - [StudyHub QA testing patterns](project_testing_patterns.md) — test credentials, shell script setup, auth client, dev server checks
