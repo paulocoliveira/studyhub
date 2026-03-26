@@ -12,4 +12,5 @@ urlpatterns = [
     path('<int:pk>/delete/', views.ContentDeleteView.as_view(), name='delete'),
     path('<int:pk>/status/', views.ContentStatusUpdateView.as_view(), name='status_update'),
     path('<int:pk>/refresh-preview/', views.RefreshPreviewView.as_view(), name='refresh_preview'),
+    path('fetch-metadata/', views.FetchMetadataView.as_view(), name='fetch_metadata'),
 ]

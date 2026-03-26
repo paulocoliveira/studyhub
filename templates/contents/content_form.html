@@ -312,6 +312,53 @@
         });
     });
 
+    // Fetch URL metadata on blur — populate title/description if empty
+    (function() {
+        var urlInput = document.getElementById('id_url');
+        if (!urlInput) return;
+        var fetchMetadataUrl = '{% url "contents:fetch_metadata" %}';
+
+        urlInput.addEventListener('blur', function() {
+            var url = this.value.trim();
+            if (!url) return;
+
+            var titleField = document.getElementById('id_title');
+            var descField = document.getElementById('id_description');
+            var needsTitle = titleField && !titleField.value.trim();
+            var needsDesc = descField && !descField.value.trim();
+            if (!needsTitle && !needsDesc) return;
+
+            // Loading indicator
+            var indicator = document.createElement('span');
+            indicator.id = 'url-fetch-indicator';
+            indicator.className = 'text-xs text-zinc-500 ml-2';
+            indicator.textContent = 'Fetching metadata…';
+            var hint = urlInput.parentElement.querySelector('p');
+            if (hint) hint.after(indicator); else urlInput.after(indicator);
+
+            fetch(fetchMetadataUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify({url: url}),
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                indicator.remove();
+                if (!data.success) return;
+                if (needsTitle && data.title && titleField && !titleField.value.trim()) {
+                    titleField.value = data.title;
+                }
+                if (needsDesc && data.description && descField && !descField.value.trim()) {
+                    descField.value = data.description;
+                }
+            })
+            .catch(function() { indicator.remove(); });
+        });
+    }());
+
     // Auto-detect content type from URL on blur
     (function() {
         var urlInput = document.getElementById('id_url');

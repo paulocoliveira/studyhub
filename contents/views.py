@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -143,6 +145,24 @@ class ContentStatusUpdateView(LoginRequiredMixin, View):
             )
         referer = request.META.get('HTTP_REFERER')
         return redirect(referer or reverse('contents:list'))
+
+
+class FetchMetadataView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            data = json.loads(request.body)
+        except (json.JSONDecodeError, ValueError):
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+        url = (data.get('url') or '').strip()
+        if not url:
+            return JsonResponse({'success': False, 'error': 'URL is required'}, status=400)
+        result = LinkPreviewService().fetch_preview(url)
+        return JsonResponse({
+            'success': True,
+            'title': result.get('og_title') or '',
+            'description': result.get('og_description') or '',
+            'preview_image_url': result.get('preview_image_url') or '',
+        })
 
 
 class RefreshPreviewView(LoginRequiredMixin, View):
