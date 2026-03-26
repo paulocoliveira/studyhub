@@ -3,3 +3,4 @@
 - [Sprint 5 AI Insights](project_sprint5_ai_insights.md) — AIService + rate limiting + 3 JSON API views in insights app; no models/migrations; ANTHROPIC_API_KEY in settings
 - [Sprint 7 Link Preview and File Upload](project_sprint7_link_preview_file_upload.md) — OG preview fetch via pre_save signal, file upload with validators, get_card_image() method; requests+beautifulsoup4 added
 - [Sprint 8 API Key Settings](project_sprint8_api_key_settings.md) — per-user ai_provider + ai_api_key on CustomUser; AIService supports Anthropic+OpenAI; openai==2.29.0 added
+- [Sprint 9 Automated Tests](project_sprint9_tests.md) — 78 tests across all apps; category/tag unique_together raises IntegrityError (not form error); mock target is insights.views.AIService
