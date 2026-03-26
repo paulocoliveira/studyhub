@@ -1,32 +1,574 @@
 {% extends 'base.html' %}
 
 {% block title %}Insights — StudyHub{% endblock %}
-
 {% block page_title %}Insights{% endblock %}
 
 {% block content %}
-<div class='max-w-4xl'>
-    <div class='mb-8'>
-        <h2 class='text-3xl font-bold text-white'>Insights</h2>
-        <p class='mt-1 text-sm text-zinc-400'>AI-powered analysis of your learning habits.</p>
-    </div>
+<div class='max-w-7xl'>
 
-    <div class='bg-gradient-to-br from-zinc-900 via-zinc-900 to-sky-950/20 border border-sky-500/20 rounded-xl p-6'>
-        <div class='flex items-start gap-4'>
-            <div class='w-10 h-10 rounded-lg bg-sky-500/10 flex items-center justify-center shrink-0'>
-                <svg xmlns='http://www.w3.org/2000/svg' class='h-5 w-5 text-sky-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
-                    <circle cx='12' cy='12' r='10'/>
-                    <line x1='12' y1='8' x2='12' y2='12'/>
-                    <line x1='12' y1='16' x2='12.01' y2='16'/>
+  {# ── Page header ──────────────────────────────────────── #}
+  <div class='mb-8'>
+    <h2 class='text-3xl font-bold text-white'>AI Insights</h2>
+    <p class='mt-2 text-sm text-zinc-400 max-w-2xl'>
+      Your personal learning intelligence hub. Discover what to study next, revisit forgotten content,
+      identify patterns in your habits, and chat with your AI learning assistant.
+    </p>
+  </div>
+
+  {# ── Two-column grid ──────────────────────────────────── #}
+  <div class='grid grid-cols-1 lg:grid-cols-12 gap-6'>
+
+    {# ── LEFT: AI Cards ───────────────────────────────────── #}
+    <div class='lg:col-span-7 flex flex-col gap-6'>
+
+      {# ── 1. Forgotten Content (auto-loaded) ─────────────── #}
+      <section aria-labelledby='heading-forgotten'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-5'>
+          <div class='flex items-center justify-between mb-4'>
+            <div class='flex items-center gap-2'>
+              <div class='w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-amber-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                  <circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/>
                 </svg>
+              </div>
+              <h3 id='heading-forgotten' class='text-base font-semibold text-white'>Forgotten Content</h3>
+            </div>
+            <span class='text-xs text-zinc-500'>Saved 30+ days ago, never started</span>
+          </div>
+          <div id='forgotten-loading' class='flex items-center gap-2 py-4'>
+            <div class='w-4 h-4 border-2 border-zinc-600 border-t-amber-400 rounded-full animate-spin'></div>
+            <span class='text-sm text-zinc-500'>Loading...</span>
+          </div>
+          <div id='forgotten-list' class='hidden'></div>
+          <div id='forgotten-empty' class='hidden py-6 text-center'>
+            <p class='text-sm text-emerald-400 font-medium'>Nothing forgotten — great job!</p>
+            <p class='text-xs text-zinc-500 mt-1'>All your saved content is actively being worked on.</p>
+          </div>
+          <div id='forgotten-error' class='hidden text-sm text-rose-400 py-2'></div>
+        </div>
+      </section>
+
+      {# ── 2. What to Study Next ──────────────────────────── #}
+      <section aria-labelledby='heading-next'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-5'>
+          <div class='flex items-center justify-between mb-4'>
+            <div class='flex items-center gap-2'>
+              <div class='w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-green-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                  <polyline points='9 18 15 12 9 6'/>
+                </svg>
+              </div>
+              <h3 id='heading-next' class='text-base font-semibold text-white'>What to Study Next</h3>
+            </div>
+            <button id='btn-suggest-next' type='button'
+              class='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+              bg-gradient-to-r from-green-500 to-emerald-600 text-white
+              hover:from-green-400 hover:to-emerald-500 transition-all duration-200 shadow-sm shadow-green-500/20'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M12 2L2 7l10 5 10-5-10-5z'/><path d='M2 17l10 5 10-5'/><path d='M2 12l10 5 10-5'/>
+              </svg>
+              Ask AI
+            </button>
+          </div>
+          <div id='next-placeholder' class='py-4 text-sm text-zinc-500'>
+            Click "Ask AI" to get personalized recommendations on what to study next.
+          </div>
+          <div id='next-loading' class='hidden flex items-center gap-2 py-4'>
+            <div class='w-4 h-4 border-2 border-zinc-600 border-t-green-400 rounded-full animate-spin'></div>
+            <span class='text-sm text-zinc-500'>Analyzing your content...</span>
+          </div>
+          <div id='next-result' class='hidden prose prose-sm prose-invert max-w-none text-zinc-300 text-sm leading-relaxed'></div>
+          <div id='next-error' class='hidden text-sm text-rose-400 py-2'></div>
+        </div>
+      </section>
+
+      {# ── 3. Generate Insights (existing) ────────────────── #}
+      <section aria-labelledby='heading-insights'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-5'>
+          <div class='flex items-center justify-between mb-4'>
+            <div class='flex items-center gap-2'>
+              <div class='w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-sky-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                  <circle cx='12' cy='12' r='10'/><line x1='12' y1='8' x2='12' y2='12'/><line x1='12' y1='16' x2='12.01' y2='16'/>
+                </svg>
+              </div>
+              <h3 id='heading-insights' class='text-base font-semibold text-white'>Consumption Insights</h3>
+            </div>
+            <button id='btn-generate-insights' type='button'
+              class='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+              bg-gradient-to-r from-sky-500 to-blue-600 text-white
+              hover:from-sky-400 hover:to-blue-500 transition-all duration-200 shadow-sm shadow-sky-500/20'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <polyline points='22 12 18 12 15 21 9 3 6 12 2 12'/>
+              </svg>
+              Analyze
+            </button>
+          </div>
+          <div id='insights-placeholder' class='py-4 text-sm text-zinc-500'>
+            Click "Analyze" to get an AI-generated analysis of your learning habits.
+          </div>
+          <div id='insights-loading' class='hidden flex items-center gap-2 py-4'>
+            <div class='w-4 h-4 border-2 border-zinc-600 border-t-sky-400 rounded-full animate-spin'></div>
+            <span class='text-sm text-zinc-500'>Analyzing habits...</span>
+          </div>
+          <div id='insights-result' class='hidden prose prose-sm prose-invert max-w-none text-zinc-300 text-sm leading-relaxed'></div>
+          <div id='insights-error' class='hidden text-sm text-rose-400 py-2'></div>
+        </div>
+      </section>
+
+      {# ── 4. Topic Patterns ──────────────────────────────── #}
+      <section aria-labelledby='heading-topics'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-5'>
+          <div class='flex items-center justify-between mb-4'>
+            <div class='flex items-center gap-2'>
+              <div class='w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-violet-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                  <path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/>
+                </svg>
+              </div>
+              <h3 id='heading-topics' class='text-base font-semibold text-white'>Topic Patterns</h3>
+            </div>
+            <button id='btn-analyze-topics' type='button'
+              class='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+              bg-gradient-to-r from-violet-500 to-purple-600 text-white
+              hover:from-violet-400 hover:to-purple-500 transition-all duration-200 shadow-sm shadow-violet-500/20'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z'/><line x1='7' y1='7' x2='7.01' y2='7'/>
+              </svg>
+              Identify Patterns
+            </button>
+          </div>
+          <div id='topics-placeholder' class='py-4 text-sm text-zinc-500'>
+            Click "Identify Patterns" to discover recurring themes and get deeper study suggestions.
+          </div>
+          <div id='topics-loading' class='hidden flex items-center gap-2 py-4'>
+            <div class='w-4 h-4 border-2 border-zinc-600 border-t-violet-400 rounded-full animate-spin'></div>
+            <span class='text-sm text-zinc-500'>Analyzing patterns...</span>
+          </div>
+          <div id='topics-result' class='hidden prose prose-sm prose-invert max-w-none text-zinc-300 text-sm leading-relaxed'></div>
+          <div id='topics-error' class='hidden text-sm text-rose-400 py-2'></div>
+        </div>
+      </section>
+
+      {# ── 5. Weekly Summary ──────────────────────────────── #}
+      <section aria-labelledby='heading-weekly'>
+        <div class='bg-zinc-900 border border-zinc-800 rounded-xl p-5'>
+          <div class='flex items-center justify-between mb-4'>
+            <div class='flex items-center gap-2'>
+              <div class='w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0'>
+                <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-emerald-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                  <rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/>
+                </svg>
+              </div>
+              <h3 id='heading-weekly' class='text-base font-semibold text-white'>Weekly Summary</h3>
+            </div>
+            <button id='btn-weekly-summary' type='button'
+              class='flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
+              bg-gradient-to-r from-emerald-500 to-teal-600 text-white
+              hover:from-emerald-400 hover:to-teal-500 transition-all duration-200 shadow-sm shadow-emerald-500/20'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-3.5 w-3.5' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <rect x='3' y='4' width='18' height='18' rx='2' ry='2'/><line x1='16' y1='2' x2='16' y2='6'/><line x1='8' y1='2' x2='8' y2='6'/><line x1='3' y1='10' x2='21' y2='10'/>
+              </svg>
+              Generate Summary
+            </button>
+          </div>
+          <div id='weekly-placeholder' class='py-4 text-sm text-zinc-500'>
+            Click "Generate Summary" for a narrative overview of your learning activity this week.
+          </div>
+          <div id='weekly-loading' class='hidden flex items-center gap-2 py-4'>
+            <div class='w-4 h-4 border-2 border-zinc-600 border-t-emerald-400 rounded-full animate-spin'></div>
+            <span class='text-sm text-zinc-500'>Generating summary...</span>
+          </div>
+          <div id='weekly-result' class='hidden'></div>
+          <div id='weekly-error' class='hidden text-sm text-rose-400 py-2'></div>
+        </div>
+      </section>
+
+    </div>{# end left column #}
+
+    {# ── RIGHT: AI Chat ───────────────────────────────────── #}
+    <div class='lg:col-span-5'>
+      <div class='bg-zinc-900 border border-zinc-800 rounded-xl flex flex-col h-full min-h-[600px] lg:sticky lg:top-20'>
+
+        {# Chat header #}
+        <div class='flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0'>
+          <div class='flex items-center gap-2'>
+            <div class='w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4 text-green-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'/>
+              </svg>
             </div>
             <div>
-                <h3 class='text-base font-semibold text-white mb-1'>AI Insights — Coming in Sprint 5</h3>
-                <p class='text-sm text-zinc-400 leading-relaxed'>
-                    Claude AI-powered consumption analysis, category suggestions, and description generation will be implemented in Sprint 5.
-                </p>
+              <h3 class='text-sm font-semibold text-white'>Learning Assistant</h3>
+              <p class='text-xs text-zinc-500'>Knows your content library</p>
             </div>
+          </div>
+          <button id='btn-new-chat' type='button'
+            class='text-xs text-zinc-500 hover:text-zinc-300 px-2 py-1 rounded hover:bg-zinc-800 transition-all duration-200'
+            title='Start new conversation'>
+            New chat
+          </button>
         </div>
-    </div>
+
+        {# Message list #}
+        <div id='chat-messages' class='flex-1 overflow-y-auto p-4 flex flex-col gap-3 min-h-0'>
+
+          {# Initial assistant greeting #}
+          <div class='flex gap-2 items-start'>
+            <div class='w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-3 w-3 text-green-400' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <path d='M12 2L2 7l10 5 10-5-10-5z'/>
+              </svg>
+            </div>
+            <div class='bg-zinc-800 rounded-xl rounded-tl-sm px-3 py-2 max-w-xs text-sm text-zinc-300'>
+              Hi! I'm your learning assistant. I have full context about your saved content, categories, and habits. Ask me anything!
+            </div>
+          </div>
+
+        </div>
+
+        {# Starter question chips #}
+        <div id='chat-chips' class='px-4 pb-3 flex flex-wrap gap-2 shrink-0'>
+          <button type='button' data-chip='What should I study next?'
+            class='chip text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700 transition-all duration-150'>
+            What should I study next?
+          </button>
+          <button type='button' data-chip='Which topics am I most focused on?'
+            class='chip text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700 transition-all duration-150'>
+            Most focused topics?
+          </button>
+          <button type='button' data-chip='What have I been ignoring?'
+            class='chip text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700 transition-all duration-150'>
+            What am I ignoring?
+          </button>
+          <button type='button' data-chip='Give me a weekly summary of my learning.'
+            class='chip text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700 transition-all duration-150'>
+            Weekly summary
+          </button>
+        </div>
+
+        {# Input area #}
+        <div class='px-4 pb-4 shrink-0'>
+          <div class='flex items-end gap-2'>
+            <label for='chat-input' class='sr-only'>Message your learning assistant</label>
+            <textarea id='chat-input' rows='2'
+              class='flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500
+              focus:outline-none focus:ring-2 focus:ring-green-500/40 focus:border-green-500/50
+              resize-none transition-all duration-200'
+              placeholder='Ask about your learning habits...'></textarea>
+            <button id='btn-chat-send' type='button'
+              class='shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600
+              hover:from-green-400 hover:to-emerald-500 text-white flex items-center justify-center
+              transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-green-500/20'
+              aria-label='Send message'>
+              <svg xmlns='http://www.w3.org/2000/svg' class='h-4 w-4' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'>
+                <line x1='22' y1='2' x2='11' y2='13'/><polygon points='22 2 15 22 11 13 2 9 22 2'/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>{# end right column #}
+
+  </div>{# end grid #}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  'use strict';
+
+  // ── CSRF helper ──────────────────────────────────────────
+  function getCsrf() {
+    var el = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (el) return el.value;
+    var m = document.cookie.match(/csrftoken=([^;]+)/);
+    return m ? m[1] : '';
+  }
+
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCsrf(),
+      },
+      body: JSON.stringify(body),
+    }).then(function(r) { return r.json(); });
+  }
+
+  function getJson(url) {
+    return fetch(url, {
+      headers: { 'X-CSRFToken': getCsrf() },
+    }).then(function(r) { return r.json(); });
+  }
+
+  // ── FORGOTTEN CONTENT ────────────────────────────────────
+  function loadForgottenContent() {
+    getJson('/insights/forgotten-contents/').then(function(data) {
+      document.getElementById('forgotten-loading').classList.add('hidden');
+      if (!data.success) {
+        var el = document.getElementById('forgotten-error');
+        el.textContent = data.error || 'Could not load forgotten content.';
+        el.classList.remove('hidden');
+        return;
+      }
+      if (!data.items || data.items.length === 0) {
+        document.getElementById('forgotten-empty').classList.remove('hidden');
+        return;
+      }
+      var list = document.getElementById('forgotten-list');
+      var typeColors = {
+        article: 'bg-violet-500/10 text-violet-400',
+        video: 'bg-rose-500/10 text-rose-400',
+        podcast: 'bg-orange-500/10 text-orange-400',
+        course: 'bg-cyan-500/10 text-cyan-400',
+        book: 'bg-emerald-500/10 text-emerald-400',
+        tool: 'bg-pink-500/10 text-pink-400',
+      };
+      var html = '<ul class="flex flex-col divide-y divide-zinc-800">';
+      data.items.forEach(function(item) {
+        var color = typeColors[item.content_type] || 'bg-zinc-500/10 text-zinc-400';
+        var label = item.content_type.charAt(0).toUpperCase() + item.content_type.slice(1);
+        var safeTitle = escapeHtml(item.title);
+        html += '<li class="py-3 first:pt-0 last:pb-0 flex items-center justify-between gap-3">'
+          + '<div class="min-w-0 flex-1">'
+          + '<a href="' + item.detail_url + '" class="text-sm font-medium text-zinc-100 hover:text-green-400 transition-colors duration-200 truncate block" title="' + safeTitle + '">' + safeTitle + '</a>'
+          + '<p class="text-xs text-zinc-500 mt-0.5">' + item.days_since_saved + ' days ago</p>'
+          + '</div>'
+          + '<span class="shrink-0 px-2 py-0.5 text-xs font-medium rounded-full ' + color + '">' + label + '</span>'
+          + '</li>';
+      });
+      html += '</ul>';
+      list.innerHTML = html;
+      list.classList.remove('hidden');
+    }).catch(function() {
+      document.getElementById('forgotten-loading').classList.add('hidden');
+      var el = document.getElementById('forgotten-error');
+      el.textContent = 'Failed to load forgotten content.';
+      el.classList.remove('hidden');
+    });
+  }
+
+  // ── GENERIC AI CARD HELPER ────────────────────────────────
+  function setupAiCard(btnId, loadingId, placeholderId, resultId, errorId, fetchFn) {
+    var btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      document.getElementById(placeholderId).classList.add('hidden');
+      document.getElementById(resultId).classList.add('hidden');
+      document.getElementById(errorId).classList.add('hidden');
+      document.getElementById(loadingId).classList.remove('hidden');
+
+      fetchFn().then(function(data) {
+        document.getElementById(loadingId).classList.add('hidden');
+        if (data.success) {
+          var res = document.getElementById(resultId);
+          res.innerHTML = data.html || data.insights || '';
+          res.classList.remove('hidden');
+        } else {
+          var err = document.getElementById(errorId);
+          err.textContent = data.error || 'Something went wrong.';
+          err.classList.remove('hidden');
+        }
+        btn.disabled = false;
+      }).catch(function() {
+        document.getElementById(loadingId).classList.add('hidden');
+        var err = document.getElementById(errorId);
+        err.textContent = 'Request failed. Please try again.';
+        err.classList.remove('hidden');
+        btn.disabled = false;
+      });
+    });
+  }
+
+  // ── WHAT TO STUDY NEXT ────────────────────────────────────
+  setupAiCard('btn-suggest-next', 'next-loading', 'next-placeholder', 'next-result', 'next-error',
+    function() { return postJson('/insights/suggest-next/', {}); });
+
+  // ── GENERATE INSIGHTS ─────────────────────────────────────
+  setupAiCard('btn-generate-insights', 'insights-loading', 'insights-placeholder', 'insights-result', 'insights-error',
+    function() {
+      return fetch('/insights/generate-insights/', {
+        headers: { 'X-CSRFToken': getCsrf() },
+      }).then(function(r) {
+        return r.json().then(function(d) {
+          // generate-insights returns {success, insights} not {success, html}
+          if (d.success && d.insights) {
+            d.html = '<p class="whitespace-pre-wrap">' + d.insights.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') + '</p>';
+          }
+          return d;
+        });
+      });
+    });
+
+  // ── TOPIC PATTERNS ────────────────────────────────────────
+  setupAiCard('btn-analyze-topics', 'topics-loading', 'topics-placeholder', 'topics-result', 'topics-error',
+    function() { return postJson('/insights/analyze-topics/', {}); });
+
+  // ── WEEKLY SUMMARY ────────────────────────────────────────
+  document.getElementById('btn-weekly-summary').addEventListener('click', function() {
+    var btn = this;
+    btn.disabled = true;
+    document.getElementById('weekly-placeholder').classList.add('hidden');
+    document.getElementById('weekly-result').classList.add('hidden');
+    document.getElementById('weekly-error').classList.add('hidden');
+    document.getElementById('weekly-loading').classList.remove('hidden');
+    postJson('/insights/weekly-summary/', {}).then(function(data) {
+      document.getElementById('weekly-loading').classList.add('hidden');
+      if (data.success) {
+        var res = document.getElementById('weekly-result');
+        res.innerHTML = '<blockquote class="border-l-4 border-emerald-500/40 pl-4 py-2 text-zinc-300 text-sm leading-relaxed italic bg-emerald-500/5 rounded-r-lg">'
+          + (data.html || '') + '</blockquote>';
+        res.classList.remove('hidden');
+      } else {
+        var err = document.getElementById('weekly-error');
+        err.textContent = data.error || 'Something went wrong.';
+        err.classList.remove('hidden');
+      }
+      btn.disabled = false;
+    }).catch(function() {
+      document.getElementById('weekly-loading').classList.add('hidden');
+      document.getElementById('weekly-error').textContent = 'Request failed.';
+      document.getElementById('weekly-error').classList.remove('hidden');
+      btn.disabled = false;
+    });
+  });
+
+  // ── AI CHAT ───────────────────────────────────────────────
+  var chatHistory = [];
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function appendMessage(role, text) {
+    var container = document.getElementById('chat-messages');
+    var div = document.createElement('div');
+    div.className = 'flex gap-2 items-start' + (role === 'user' ? ' justify-end' : '');
+
+    if (role === 'user') {
+      div.innerHTML = '<div class="bg-green-500/10 border border-green-500/20 rounded-xl rounded-tr-sm px-3 py-2 max-w-xs text-sm text-green-100">'
+        + escapeHtml(text) + '</div>';
+    } else {
+      div.innerHTML = '<div class="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">'
+        + '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>'
+        + '</div>'
+        + '<div class="bg-zinc-800 rounded-xl rounded-tl-sm px-3 py-2 max-w-xs text-sm text-zinc-300">'
+        + text + '</div>';
+    }
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function appendTyping() {
+    var container = document.getElementById('chat-messages');
+    var div = document.createElement('div');
+    div.id = 'chat-typing';
+    div.className = 'flex gap-2 items-start';
+    div.innerHTML = '<div class="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">'
+      + '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>'
+      + '</div>'
+      + '<div class="bg-zinc-800 rounded-xl rounded-tl-sm px-3 py-2 flex items-center gap-1">'
+      + '<span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style="animation-delay:0ms"></span>'
+      + '<span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style="animation-delay:150ms"></span>'
+      + '<span class="w-1.5 h-1.5 rounded-full bg-zinc-500 animate-bounce" style="animation-delay:300ms"></span>'
+      + '</div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeTyping() {
+    var el = document.getElementById('chat-typing');
+    if (el) el.remove();
+  }
+
+  function sendMessage(text) {
+    text = text.trim();
+    if (!text) return;
+
+    // hide chips after first message
+    document.getElementById('chat-chips').classList.add('hidden');
+
+    appendMessage('user', text);
+    chatHistory.push({ role: 'user', content: text });
+
+    var input = document.getElementById('chat-input');
+    var sendBtn = document.getElementById('btn-chat-send');
+    input.value = '';
+    input.disabled = true;
+    sendBtn.disabled = true;
+    appendTyping();
+
+    postJson('/insights/chat/', { message: text, history: chatHistory.slice(0, -1) })
+      .then(function(data) {
+        removeTyping();
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+        if (data.success) {
+          var reply = data.reply || '';
+          // simple markdown: **bold** and newlines
+          var rendered = escapeHtml(reply)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+          appendMessage('assistant', rendered);
+          chatHistory.push({ role: 'assistant', content: reply });
+        } else {
+          var errHtml = '<span class="text-rose-400">' + escapeHtml(data.error || 'Something went wrong.') + '</span>';
+          appendMessage('assistant', errHtml);
+        }
+      })
+      .catch(function() {
+        removeTyping();
+        input.disabled = false;
+        sendBtn.disabled = false;
+        appendMessage('assistant', '<span class="text-rose-400">Request failed. Please try again.</span>');
+      });
+  }
+
+  // Send on button click
+  document.getElementById('btn-chat-send').addEventListener('click', function() {
+    sendMessage(document.getElementById('chat-input').value);
+  });
+
+  // Send on Enter (without Shift)
+  document.getElementById('chat-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage(this.value);
+    }
+  });
+
+  // Chip clicks
+  document.querySelectorAll('.chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      sendMessage(this.dataset.chip);
+    });
+  });
+
+  // New chat
+  document.getElementById('btn-new-chat').addEventListener('click', function() {
+    chatHistory = [];
+    var container = document.getElementById('chat-messages');
+    container.innerHTML = '<div class="flex gap-2 items-start">'
+      + '<div class="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">'
+      + '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>'
+      + '</div>'
+      + '<div class="bg-zinc-800 rounded-xl rounded-tl-sm px-3 py-2 max-w-xs text-sm text-zinc-300">'
+      + 'New conversation started. How can I help you?'
+      + '</div></div>';
+    document.getElementById('chat-chips').classList.remove('hidden');
+  });
+
+  // ── AUTO-LOAD FORGOTTEN CONTENT ───────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    loadForgottenContent();
+  });
+
+})();
+</script>
 {% endblock %}

@@ -288,43 +288,43 @@
 
 > **Goal:** Extend the AI layer with personalized learning recommendations, forgotten content detection, topic pattern analysis, weekly summaries, and a conversational AI chat grounded in the user's own data (RAG-like).
 
-- [ ] **8.1 — "What to Study Next" Feature**
-  - [ ] 8.1.1 — Add a `suggest_next(user)` method to `AIService` in `insights/services.py`: query the user's content with status `new` or `in_progress`, ordered by `created_at`. Build a structured prompt listing each item (title, type, category, tags, days since saved). Ask the AI to return a prioritized list of 3–5 items to focus on next with a one-line reason for each.
-  - [ ] 8.1.2 — Create `SuggestNextView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }` with the rendered recommendation list. Reuse the existing rate-limiting pattern.
-  - [ ] 8.1.3 — Add URL `suggest-next/` to `insights/urls.py`.
-  - [ ] 8.1.4 — Add a "What to Study Next" card on the Insights page with a trigger button, loading state, and result area.
+- [X] **8.1 — "What to Study Next" Feature**
+  - [X] 8.1.1 — Add a `suggest_next(user)` method to `AIService` in `insights/services.py`: query the user's content with status `new` or `in_progress`, ordered by `created_at`. Build a structured prompt listing each item (title, type, category, tags, days since saved). Ask the AI to return a prioritized list of 3–5 items to focus on next with a one-line reason for each.
+  - [X] 8.1.2 — Create `SuggestNextView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }` with the rendered recommendation list. Reuse the existing rate-limiting pattern.
+  - [X] 8.1.3 — Add URL `suggest-next/` to `insights/urls.py`.
+  - [X] 8.1.4 — Add a "What to Study Next" card on the Insights page with a trigger button, loading state, and result area.
 
-- [ ] **8.2 — Forgotten Content Detection**
-  - [ ] 8.2.1 — Add a `get_forgotten_contents(user, days=30)` method to `DashboardService` (or a new `InsightsService`): returns content items with `status='new'` and `created_at__lte=now()-timedelta(days=days)`, ordered by `created_at` ascending (oldest first), limited to 10 items.
-  - [ ] 8.2.2 — Add a `ForgottenContentsView` in `insights/views.py`: `LoginRequiredMixin`, GET, returns JSON list of forgotten content items (id, title, type, days_since_saved, url to detail page).
-  - [ ] 8.2.3 — Add URL `forgotten-contents/` to `insights/urls.py`.
-  - [ ] 8.2.4 — Add a "Forgotten Content" section to the Insights page: auto-loaded on page render (no button needed), shows a list of items with title, type badge, days-since-saved label, and a link to the detail page. If empty, show a positive empty state ("Nothing forgotten — great job!").
+- [X] **8.2 — Forgotten Content Detection**
+  - [X] 8.2.1 — Add a `get_forgotten_contents(user, days=30)` method to `DashboardService` (or a new `InsightsService`): returns content items with `status='new'` and `created_at__lte=now()-timedelta(days=days)`, ordered by `created_at` ascending (oldest first), limited to 10 items.
+  - [X] 8.2.2 — Add a `ForgottenContentsView` in `insights/views.py`: `LoginRequiredMixin`, GET, returns JSON list of forgotten content items (id, title, type, days_since_saved, url to detail page).
+  - [X] 8.2.3 — Add URL `forgotten-contents/` to `insights/urls.py`.
+  - [X] 8.2.4 — Add a "Forgotten Content" section to the Insights page: auto-loaded on page render (no button needed), shows a list of items with title, type badge, days-since-saved label, and a link to the detail page. If empty, show a positive empty state ("Nothing forgotten — great job!").
 
-- [ ] **8.3 — Topic Pattern Analysis**
-  - [ ] 8.3.1 — Add a `analyze_topics(user)` method to `AIService`: build a prompt listing the user's top 10 tags and top 5 categories with their content counts. Ask the AI to identify patterns and suggest 2–3 directions for deeper study.
-  - [ ] 8.3.2 — Create `AnalyzeTopicsView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
-  - [ ] 8.3.3 — Add URL `analyze-topics/` to `insights/urls.py`.
-  - [ ] 8.3.4 — Add a "Topic Patterns" card on the Insights page with a trigger button, loading state, and result area.
+- [X] **8.3 — Topic Pattern Analysis**
+  - [X] 8.3.1 — Add a `analyze_topics(user)` method to `AIService`: build a prompt listing the user's top 10 tags and top 5 categories with their content counts. Ask the AI to identify patterns and suggest 2–3 directions for deeper study.
+  - [X] 8.3.2 — Create `AnalyzeTopicsView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
+  - [X] 8.3.3 — Add URL `analyze-topics/` to `insights/urls.py`.
+  - [X] 8.3.4 — Add a "Topic Patterns" card on the Insights page with a trigger button, loading state, and result area.
 
-- [ ] **8.4 — Weekly Learning Summary**
-  - [ ] 8.4.1 — Add a `weekly_summary(user)` method to `AIService`: query content updated in the last 7 days (completed items), content created in the last 7 days (new additions), and the most active category/tag in that period. Build a prompt and ask the AI to write a short narrative summary (2–3 sentences).
-  - [ ] 8.4.2 — Create `WeeklySummaryView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
-  - [ ] 8.4.3 — Add URL `weekly-summary/` to `insights/urls.py`.
-  - [ ] 8.4.4 — Add a "Weekly Summary" card on the Insights page with a trigger button and result area. Style the result as a highlighted quote/callout block.
+- [X] **8.4 — Weekly Learning Summary**
+  - [X] 8.4.1 — Add a `weekly_summary(user)` method to `AIService`: query content updated in the last 7 days (completed items), content created in the last 7 days (new additions), and the most active category/tag in that period. Build a prompt and ask the AI to write a short narrative summary (2–3 sentences).
+  - [X] 8.4.2 — Create `WeeklySummaryView` in `insights/views.py`: `LoginRequiredMixin`, POST, returns JSON `{ "html": "..." }`.
+  - [X] 8.4.3 — Add URL `weekly-summary/` to `insights/urls.py`.
+  - [X] 8.4.4 — Add a "Weekly Summary" card on the Insights page with a trigger button and result area. Style the result as a highlighted quote/callout block.
 
-- [ ] **8.5 — AI Chat Interface (Learning Assistant)**
-  - [ ] 8.5.1 — Add a `build_user_context(user)` function in `insights/services.py`: queries the user's data and assembles a structured plain-text or JSON snapshot including: total content count, status breakdown, top 5 categories with counts, top 5 tags with counts, last 10 content titles with type/status, completion rate percentage. This is the "knowledge base" injected into each chat prompt.
-  - [ ] 8.5.2 — Add a `chat(user, message, history)` method to `AIService`: takes the user's message, the assembled context from `build_user_context()`, and the prior conversation `history` (list of `{role, content}` dicts). Builds a system prompt that establishes the AI as a personal learning assistant with access to the user's data. Calls the configured AI provider (Anthropic or OpenAI) with the full message history. Returns the assistant's reply string.
-  - [ ] 8.5.3 — Create `ChatView` in `insights/views.py`: `LoginRequiredMixin`, POST. Accepts JSON body `{ "message": "...", "history": [...] }`. Calls `AIService.chat()`. Returns JSON `{ "reply": "..." }`. Apply rate limiting (max 20 messages per user per day via session counter).
-  - [ ] 8.5.4 — Add URL `chat/` to `insights/urls.py`.
-  - [ ] 8.5.5 — Build the chat UI on the Insights page: a fixed-height scrollable message list (`#chat-messages`) with user and assistant message bubbles styled distinctly; a text input + send button at the bottom; a "New conversation" button that clears the UI history. The conversation history array lives in a JS variable — it is never stored in the database.
-  - [ ] 8.5.6 — Implement the chat JavaScript: on send, append the user message to the UI and history array, POST to `chat/` with the current message and history, append the assistant reply on success, handle error state inline (red message bubble with retry hint).
-  - [ ] 8.5.7 — Add suggested starter questions as clickable chips above the input: "What should I study next?", "Which topics am I most focused on?", "What have I been ignoring?", "Give me a weekly summary." Clicking a chip populates the input and auto-sends.
+- [X] **8.5 — AI Chat Interface (Learning Assistant)**
+  - [X] 8.5.1 — Add a `build_user_context(user)` function in `insights/services.py`: queries the user's data and assembles a structured plain-text or JSON snapshot including: total content count, status breakdown, top 5 categories with counts, top 5 tags with counts, last 10 content titles with type/status, completion rate percentage. This is the "knowledge base" injected into each chat prompt.
+  - [X] 8.5.2 — Add a `chat(user, message, history)` method to `AIService`: takes the user's message, the assembled context from `build_user_context()`, and the prior conversation `history` (list of `{role, content}` dicts). Builds a system prompt that establishes the AI as a personal learning assistant with access to the user's data. Calls the configured AI provider (Anthropic or OpenAI) with the full message history. Returns the assistant's reply string.
+  - [X] 8.5.3 — Create `ChatView` in `insights/views.py`: `LoginRequiredMixin`, POST. Accepts JSON body `{ "message": "...", "history": [...] }`. Calls `AIService.chat()`. Returns JSON `{ "reply": "..." }`. Apply rate limiting (max 20 messages per user per day via session counter).
+  - [X] 8.5.4 — Add URL `chat/` to `insights/urls.py`.
+  - [X] 8.5.5 — Build the chat UI on the Insights page: a fixed-height scrollable message list (`#chat-messages`) with user and assistant message bubbles styled distinctly; a text input + send button at the bottom; a "New conversation" button that clears the UI history. The conversation history array lives in a JS variable — it is never stored in the database.
+  - [X] 8.5.6 — Implement the chat JavaScript: on send, append the user message to the UI and history array, POST to `chat/` with the current message and history, append the assistant reply on success, handle error state inline (red message bubble with retry hint).
+  - [X] 8.5.7 — Add suggested starter questions as clickable chips above the input: "What should I study next?", "Which topics am I most focused on?", "What have I been ignoring?", "Give me a weekly summary." Clicking a chip populates the input and auto-sends.
 
-- [ ] **8.6 — Insights Page Redesign**
-  - [ ] 8.6.1 — Redesign `templates/insights/index.html` to accommodate all new sections: "Forgotten Content" (auto-loaded), "What to Study Next" (button-triggered), "Topic Patterns" (button-triggered), "Weekly Summary" (button-triggered), "Generate Insights" (existing), and the AI Chat panel.
-  - [ ] 8.6.2 — Organize the page into two columns on desktop: left column for the data-driven AI cards (forgotten content, next study, topic patterns, weekly summary, insights); right column (or full-width below) for the AI Chat.
-  - [ ] 8.6.3 — Add a page intro section with a short description of what the Insights page offers.
+- [X] **8.6 — Insights Page Redesign**
+  - [X] 8.6.1 — Redesign `templates/insights/index.html` to accommodate all new sections: "Forgotten Content" (auto-loaded), "What to Study Next" (button-triggered), "Topic Patterns" (button-triggered), "Weekly Summary" (button-triggered), "Generate Insights" (existing), and the AI Chat panel.
+  - [X] 8.6.2 — Organize the page into two columns on desktop: left column for the data-driven AI cards (forgotten content, next study, topic patterns, weekly summary, insights); right column (or full-width below) for the AI Chat.
+  - [X] 8.6.3 — Add a page intro section with a short description of what the Insights page offers.
 
 ---
 

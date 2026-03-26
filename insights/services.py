@@ -5,6 +5,57 @@ import openai as openai_sdk
 from django.conf import settings
 
 
+def build_user_context(user):
+    """
+    Build a structured text snapshot of the user's learning data for use as AI context.
+    """
+    from django.db.models import Count
+    from contents.models import Content
+    from categories.models import Category
+    from tags.models import Tag
+
+    total = Content.objects.filter(user=user).count()
+    completed = Content.objects.filter(user=user, status='completed').count()
+    in_progress = Content.objects.filter(user=user, status='in_progress').count()
+    new_count = Content.objects.filter(user=user, status='new').count()
+    completion_rate = round((completed / total * 100) if total > 0 else 0, 1)
+
+    top_cats = (
+        Category.objects.filter(user=user)
+        .annotate(count=Count('contents'))
+        .filter(count__gt=0)
+        .order_by('-count')[:5]
+    )
+    top_tags = (
+        Tag.objects.filter(user=user)
+        .annotate(count=Count('contents'))
+        .filter(count__gt=0)
+        .order_by('-count')[:5]
+    )
+    recent_contents = (
+        Content.objects.filter(user=user)
+        .select_related('category')
+        .order_by('-updated_at')[:10]
+    )
+
+    lines = [
+        f'User learning data snapshot:',
+        f'- Total saved items: {total}',
+        f'- Completed: {completed} ({completion_rate}%)',
+        f'- In progress: {in_progress}',
+        f'- Not started (new): {new_count}',
+        f'',
+        f'Top categories: {", ".join(f"{c.name} ({c.count})" for c in top_cats) or "none"}',
+        f'Top tags: {", ".join(f"{t.name} ({t.count})" for t in top_tags) or "none"}',
+        f'',
+        f'Recent items (last updated):',
+    ]
+    for item in recent_contents:
+        lines.append(f'  - "{item.title}" [{item.content_type}, {item.status}]')
+
+    return '\n'.join(lines)
+
+
 def check_rate_limit(session, action_key, max_calls=10, window_seconds=3600):
     """
     Check if an AI action is within its rate limit for the current session.
@@ -99,6 +150,146 @@ class AIService:
             + '. Return only the description, no labels or preamble.'
         )
         return self._call_ai(prompt)
+
+    def _call_ai_messages(self, messages, system_prompt=None, max_tokens=800):
+        if not self.api_key:
+            return None
+        try:
+            if self.provider == 'openai':
+                msgs = []
+                if system_prompt:
+                    msgs.append({'role': 'system', 'content': system_prompt})
+                msgs.extend(messages)
+                client = openai_sdk.OpenAI(api_key=self.api_key)
+                response = client.chat.completions.create(
+                    model=self.OPENAI_MODEL,
+                    messages=msgs,
+                    max_tokens=max_tokens,
+                )
+                return response.choices[0].message.content.strip()
+            else:
+                client = anthropic.Anthropic(api_key=self.api_key)
+                response = client.messages.create(
+                    model=self.ANTHROPIC_MODEL,
+                    max_tokens=max_tokens,
+                    system=system_prompt or '',
+                    messages=messages,
+                )
+                return response.content[0].text.strip()
+        except Exception:
+            return None
+
+    def suggest_next(self, user):
+        from django.utils import timezone
+        from datetime import timedelta
+        from contents.models import Content
+        now = timezone.now()
+        items = (
+            Content.objects
+            .filter(user=user, status__in=['new', 'in_progress'])
+            .select_related('category')
+            .prefetch_related('tags')
+            .order_by('created_at')[:20]
+        )
+        if not items:
+            return None
+        lines = []
+        for item in items:
+            days = (now - item.created_at).days
+            tags = ', '.join(item.tags.values_list('name', flat=True)) or 'none'
+            cat = item.category.name if item.category else 'uncategorized'
+            lines.append(
+                f'- "{item.title}" | type: {item.content_type} | status: {item.status}'
+                f' | category: {cat} | tags: {tags} | saved {days} days ago'
+            )
+        content_list = '\n'.join(lines)
+        prompt = (
+            f'You are a learning coach. Based on this list of content items the user has saved but not finished, '
+            f'recommend 3-5 items they should study next. For each, give a one-line reason.\n\n'
+            f'Content list:\n{content_list}\n\n'
+            f'Format your response as a numbered list. Be concise and encouraging.'
+        )
+        return self._call_ai(prompt)
+
+    def analyze_topics(self, user):
+        from django.db.models import Count
+        from categories.models import Category
+        from tags.models import Tag
+        top_categories = (
+            Category.objects
+            .filter(user=user)
+            .annotate(count=Count('contents'))
+            .filter(count__gt=0)
+            .order_by('-count')[:5]
+        )
+        top_tags = (
+            Tag.objects
+            .filter(user=user)
+            .annotate(count=Count('contents'))
+            .filter(count__gt=0)
+            .order_by('-count')[:10]
+        )
+        if not top_categories and not top_tags:
+            return None
+        cat_lines = '\n'.join(f'- {c.name}: {c.count} items' for c in top_categories) or 'No categories yet.'
+        tag_lines = '\n'.join(f'- {t.name}: {t.count} items' for t in top_tags) or 'No tags yet.'
+        prompt = (
+            f'You are a learning strategist. Based on these learning topics, identify patterns '
+            f'and suggest 2-3 specific directions for deeper study. Be actionable and encouraging.\n\n'
+            f'Top categories:\n{cat_lines}\n\n'
+            f'Top tags:\n{tag_lines}\n\n'
+            f'Format: brief pattern observation, then numbered list of suggestions.'
+        )
+        return self._call_ai(prompt)
+
+    def weekly_summary(self, user):
+        from django.utils import timezone
+        from datetime import timedelta
+        from django.db.models import Count
+        from contents.models import Content
+        now = timezone.now()
+        week_ago = now - timedelta(days=7)
+        completed_this_week = Content.objects.filter(
+            user=user, status='completed', updated_at__gte=week_ago
+        ).count()
+        added_this_week = Content.objects.filter(
+            user=user, created_at__gte=week_ago
+        ).count()
+        in_progress = Content.objects.filter(user=user, status='in_progress').count()
+        active_cat = (
+            Content.objects
+            .filter(user=user, updated_at__gte=week_ago, category__isnull=False)
+            .values('category__name')
+            .annotate(count=Count('id'))
+            .order_by('-count')
+            .first()
+        )
+        active_area = active_cat['category__name'] if active_cat else 'general topics'
+        prompt = (
+            f'Write a brief, encouraging 2-3 sentence weekly learning summary for someone who:\n'
+            f'- Completed {completed_this_week} item(s) this week\n'
+            f'- Added {added_this_week} new item(s) this week\n'
+            f'- Has {in_progress} item(s) currently in progress\n'
+            f'- Was most active in: {active_area}\n\n'
+            f'Be warm, specific, and motivational. Return only the summary text.'
+        )
+        return self._call_ai(prompt)
+
+    def chat(self, user, message, history):
+        """
+        Multi-turn chat with the user's learning data as context.
+        history: list of {'role': 'user'|'assistant', 'content': str}
+        Returns assistant reply string or None on failure.
+        """
+        context = build_user_context(user)
+        system_prompt = (
+            f'You are a personal learning assistant for a StudyHub user. '
+            f'You have access to their learning data and can answer questions about their content, '
+            f'habits, and suggest what to study next. Be concise, specific, and encouraging.\n\n'
+            f'{context}'
+        )
+        messages = list(history) + [{'role': 'user', 'content': message}]
+        return self._call_ai_messages(messages, system_prompt=system_prompt, max_tokens=600)
 
     def generate_insights(self, user_stats):
         """
