@@ -67,3 +67,13 @@ class DashboardService:
             .annotate(content_count=Count('contents'))
             .order_by('-content_count')[:5]
         )
+
+    def get_forgotten_contents(self, days=30):
+        from django.utils import timezone
+        from datetime import timedelta
+        cutoff = timezone.now() - timedelta(days=days)
+        return (
+            Content.objects
+            .filter(user=self.user, status='new', created_at__lte=cutoff)
+            .order_by('created_at')[:10]
+        )
