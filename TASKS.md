@@ -332,43 +332,43 @@
 
 > **Goal:** Add automated tests for critical functionality across all sprints, including the new AI features introduced in Sprint 8.
 
-- [ ] **9.1 — User Authentication Tests**
-  - [ ] 9.1.1 — Write tests in `users/tests.py` for: user registration with valid data succeeds, registration with duplicate email fails, registration with mismatched passwords fails
-  - [ ] 9.1.2 — Write tests for: login with correct email/password succeeds, login with wrong password fails, login with non-existent email fails
-  - [ ] 9.1.3 — Write tests for: authenticated user can access dashboard, unauthenticated user is redirected to login
-  - [ ] 9.1.4 — Write tests for: AI settings form saves `ai_provider` and `ai_api_key` correctly, blank key submission preserves existing key
+- [x] **9.1 — User Authentication Tests**
+  - [x] 9.1.1 — Write tests in `users/tests.py` for: user registration with valid data succeeds, registration with duplicate email fails, registration with mismatched passwords fails
+  - [x] 9.1.2 — Write tests for: login with correct email/password succeeds, login with wrong password fails, login with non-existent email fails
+  - [x] 9.1.3 — Write tests for: authenticated user can access dashboard, unauthenticated user is redirected to login
+  - [x] 9.1.4 — Write tests for: AI settings form saves `ai_provider` and `ai_api_key` correctly, blank key submission preserves existing key
 
-- [ ] **9.2 — Content CRUD Tests**
-  - [ ] 9.2.1 — Write tests in `contents/tests.py` for: creating content with valid data, creating content with missing required fields fails
-  - [ ] 9.2.2 — Write tests for: user can only see their own content, user cannot access another user's content detail/edit/delete
-  - [ ] 9.2.3 — Write tests for: content status update works correctly, content deletion works correctly
-  - [ ] 9.2.4 — Write tests for: content list filtering by status, type, and category returns correct results
-  - [ ] 9.2.5 — Write tests for: content list search returns correct results
-  - [ ] 9.2.6 — Write tests for: file upload accepts allowed extensions and rejects disallowed ones, file exceeding 10MB is rejected
+- [x] **9.2 — Content CRUD Tests**
+  - [x] 9.2.1 — Write tests in `contents/tests.py` for: creating content with valid data, creating content with missing required fields fails
+  - [x] 9.2.2 — Write tests for: user can only see their own content, user cannot access another user's content detail/edit/delete
+  - [x] 9.2.3 — Write tests for: content status update works correctly, content deletion works correctly
+  - [x] 9.2.4 — Write tests for: content list filtering by status, type, and category returns correct results
+  - [x] 9.2.5 — Write tests for: content list search returns correct results
+  - [x] 9.2.6 — Write tests for: file upload accepts allowed extensions and rejects disallowed ones, file exceeding 10MB is rejected
 
-- [ ] **9.3 — Category & Tag Tests**
-  - [ ] 9.3.1 — Write tests in `categories/tests.py` for: category CRUD operations, user scoping (user A cannot see/edit user B's categories)
-  - [ ] 9.3.2 — Write tests in `tags/tests.py` for: tag CRUD operations, user scoping, duplicate tag name per user fails
+- [x] **9.3 — Category & Tag Tests**
+  - [x] 9.3.1 — Write tests in `categories/tests.py` for: category CRUD operations, user scoping (user A cannot see/edit user B's categories)
+  - [x] 9.3.2 — Write tests in `tags/tests.py` for: tag CRUD operations, user scoping, duplicate tag name per user fails
 
-- [ ] **9.4 — Dashboard Tests**
-  - [ ] 9.4.1 — Write tests in `dashboard/tests.py` for: dashboard loads for authenticated user, stats are correctly calculated (create test data and verify counts)
-  - [ ] 9.4.2 — Write tests for: `DashboardService` returns correct `total_contents`, `by_status`, `by_type`, `top_categories`, `top_tags` for a user with known test data
-  - [ ] 9.4.3 — Write tests for: recently added and recently completed lists are user-scoped and ordered correctly
+- [x] **9.4 — Dashboard Tests**
+  - [x] 9.4.1 — Write tests in `dashboard/tests.py` for: dashboard loads for authenticated user, stats are correctly calculated (create test data and verify counts)
+  - [x] 9.4.2 — Write tests for: `DashboardService` returns correct `total_contents`, `by_status`, `by_type`, `top_categories`, `top_tags` for a user with known test data
+  - [x] 9.4.3 — Write tests for: recently added and recently completed lists are user-scoped and ordered correctly
 
-- [ ] **9.5 — AI Service Tests (Original Features)**
-  - [ ] 9.5.1 — Write tests in `insights/tests.py` for: `SuggestCategoryView`, `GenerateDescriptionView`, `GenerateInsightsView` all require authentication (anonymous → 302)
-  - [ ] 9.5.2 — Write tests for: all three views return valid JSON on mocked AI success response
-  - [ ] 9.5.3 — Write tests for: `GenerateInsightsView` returns HTTP 503 when `AIService.generate_insights` returns `None` (mocked failure)
-  - [ ] 9.5.4 — Write tests for: `SuggestCategoryView` returns HTTP 400 when user has no categories
+- [x] **9.5 — AI Service Tests (Original Features)**
+  - [x] 9.5.1 — Write tests in `insights/tests.py` for: `SuggestCategoryView`, `GenerateDescriptionView`, `GenerateInsightsView` all require authentication (anonymous → 302)
+  - [x] 9.5.2 — Write tests for: all three views return valid JSON on mocked AI success response
+  - [x] 9.5.3 — Write tests for: `GenerateInsightsView` returns HTTP 503 when `AIService.generate_insights` returns `None` (mocked failure)
+  - [x] 9.5.4 — Write tests for: `SuggestCategoryView` returns HTTP 400 when user has no categories
 
-- [ ] **9.6 — Advanced AI Feature Tests (Sprint 8)**
-  - [ ] 9.6.1 — Write tests for: `SuggestNextView` requires authentication, returns 200 with JSON on mocked success, returns 503 on mocked failure
-  - [ ] 9.6.2 — Write tests for: `ForgottenContentsView` requires authentication, returns only content with `status='new'` and `created_at` older than 30 days, returns empty list when no forgotten content exists
-  - [ ] 9.6.3 — Write tests for: `AnalyzeTopicsView` requires authentication, returns 200 with JSON on mocked success
-  - [ ] 9.6.4 — Write tests for: `WeeklySummaryView` requires authentication, returns 200 with JSON on mocked success
-  - [ ] 9.6.5 — Write tests for: `ChatView` requires authentication, accepts `{ "message": "...", "history": [] }`, returns `{ "reply": "..." }` on mocked success, returns error JSON on mocked failure
-  - [ ] 9.6.6 — Write tests for: `ChatView` rate limiting — after exceeding the daily session limit, subsequent requests return HTTP 429
-  - [ ] 9.6.7 — Write tests for: `build_user_context(user)` returns a non-empty string, includes the user's content count and category names
+- [x] **9.6 — Advanced AI Feature Tests (Sprint 8)**
+  - [x] 9.6.1 — Write tests for: `SuggestNextView` requires authentication, returns 200 with JSON on mocked success, returns 503 on mocked failure
+  - [x] 9.6.2 — Write tests for: `ForgottenContentsView` requires authentication, returns only content with `status='new'` and `created_at` older than 30 days, returns empty list when no forgotten content exists
+  - [x] 9.6.3 — Write tests for: `AnalyzeTopicsView` requires authentication, returns 200 with JSON on mocked success
+  - [x] 9.6.4 — Write tests for: `WeeklySummaryView` requires authentication, returns 200 with JSON on mocked success
+  - [x] 9.6.5 — Write tests for: `ChatView` requires authentication, accepts `{ "message": "...", "history": [] }`, returns `{ "reply": "..." }` on mocked success, returns error JSON on mocked failure
+  - [x] 9.6.6 — Write tests for: `ChatView` rate limiting — after exceeding the daily session limit, subsequent requests return HTTP 429
+  - [x] 9.6.7 — Write tests for: `build_user_context(user)` returns a non-empty string, includes the user's content count and category names
 
 ---
 

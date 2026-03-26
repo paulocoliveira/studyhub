@@ -25,6 +25,11 @@ class TagCreateView(LoginRequiredMixin, CreateView):
     form_class = TagForm
     template_name = 'tags/tag_form.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         form.instance.user = self.request.user
         messages.success(self.request, 'Tag created successfully.')
