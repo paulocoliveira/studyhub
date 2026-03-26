@@ -7,5 +7,5 @@ class LandingPageView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('dashboard:index')
+            return redirect('dashboard:home')
         return super().get(request, *args, **kwargs)
