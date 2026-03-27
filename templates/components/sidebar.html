@@ -38,7 +38,7 @@
 
             <!-- Contents -->
             <li>
-                {% url 'contents:list' as contents_url %}
+                {% url 'categories:list' as contents_url %}
                 <a href='{{ contents_url }}'
                     class='flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                     {% if request.path|slice:":9" == "/contents" %}bg-green-500/10 text-green-400{% else %}text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100{% endif %}'

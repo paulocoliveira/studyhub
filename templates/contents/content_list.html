@@ -12,7 +12,7 @@
             <h1 class='text-3xl font-bold text-white'>My Contents</h1>
             {% if paginator %}
             <span class='px-2.5 py-0.5 text-xs font-medium rounded-full bg-zinc-800/60 text-zinc-400 border border-zinc-700'>
-                {{ paginator.count }} item{{ paginator.count|pluralize }}
+                {{ total_count }} item{{ total_count|pluralize }}
             </span>
             {% endif %}
         </div>

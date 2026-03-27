@@ -245,3 +245,111 @@ class ContentFileUploadTest(TestCase):
         self.assertFalse(
             Content.objects.filter(user=self.user, title='Upload Test').exists()
         )
+
+
+# ---------------------------------------------------------------------------
+# Bug verification tests — PASS when bug is present, FAIL when bug is fixed
+# ---------------------------------------------------------------------------
+
+
+class BugVerificationTests(TestCase):
+    def setUp(self):
+        self.user = make_user()
+        self.client.force_login(self.user)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.7 — sort=created_at (oldest first) uses same order as newest
+    # ------------------------------------------------------------------
+    def test_bug_10_1_7_oldest_sort_same_as_newest(self):
+        import datetime
+        from django.utils import timezone
+
+        c1 = make_content(self.user, title='Alpha', content_type='article', status='new')
+        c2 = make_content(self.user, title='Beta', content_type='article', status='new')
+        c3 = make_content(self.user, title='Gamma', content_type='article', status='new')
+
+        now = timezone.now()
+        Content.objects.filter(pk=c1.pk).update(
+            created_at=now - datetime.timedelta(days=10)
+        )
+        Content.objects.filter(pk=c2.pk).update(
+            created_at=now - datetime.timedelta(days=5)
+        )
+        Content.objects.filter(pk=c3.pk).update(
+            created_at=now - datetime.timedelta(days=1)
+        )
+
+        response_oldest = self.client.get(
+            reverse('contents:list'), {'sort': 'created_at'}
+        )
+        response_newest = self.client.get(
+            reverse('contents:list'), {'sort': '-created_at'}
+        )
+
+        titles_oldest = [c.title for c in response_oldest.context['contents']]
+        titles_newest = [c.title for c in response_newest.context['contents']]
+
+        # Bug present: both orderings produce identical results
+        self.assertEqual(titles_oldest, titles_newest)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.8 — mark completed saves in_progress instead
+    # ------------------------------------------------------------------
+    def test_bug_10_1_8_mark_completed_saves_in_progress(self):
+        content = make_content(self.user, status='new')
+        self.client.post(
+            reverse('contents:status_update', kwargs={'pk': content.pk}),
+            {'status': 'completed'},
+            HTTP_REFERER=reverse('contents:list'),
+        )
+        content.refresh_from_db()
+        # Bug present: status is saved as in_progress, not completed
+        self.assertEqual(content.status, 'in_progress')
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.9 — total_count ignores active filters
+    # ------------------------------------------------------------------
+    def test_bug_10_1_9_total_count_ignores_filter(self):
+        for i in range(5):
+            make_content(
+                self.user,
+                title=f'New Item {i}',
+                content_type='article',
+                status='new',
+            )
+        make_content(
+            self.user,
+            title='Completed Item',
+            content_type='article',
+            status='completed',
+        )
+
+        response = self.client.get(
+            reverse('contents:list'),
+            {'status': 'completed', 'show_completed': '1'},
+        )
+        total_count = response.context['total_count']
+        # Bug present: total_count reflects all 6 items regardless of filter
+        self.assertEqual(total_count, 6)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.17 — create content flashes an ERROR message instead of SUCCESS
+    # ------------------------------------------------------------------
+    def test_bug_10_1_17_create_content_uses_error_message(self):
+        from django.contrib.messages import constants as message_constants
+
+        response = self.client.post(
+            reverse('contents:create'),
+            {
+                'title': 'My New Content',
+                'content_type': 'article',
+                'status': 'new',
+                'description': '',
+                'url': '',
+            },
+            follow=True,
+        )
+        msgs = list(response.context['messages'])
+        self.assertTrue(len(msgs) > 0)
+        # Bug present: the message level is ERROR (40) instead of SUCCESS (25)
+        self.assertEqual(msgs[0].level, message_constants.ERROR)

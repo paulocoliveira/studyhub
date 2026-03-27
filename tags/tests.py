@@ -93,3 +93,39 @@ class TagDuplicateNameTest(TestCase):
                 reverse('tags:create'),
                 {'name': 'duplicate'},
             )
+
+
+# ---------------------------------------------------------------------------
+# Bug verification tests — PASS when bug is present, FAIL when bug is fixed
+# ---------------------------------------------------------------------------
+
+
+class BugVerificationTests(TestCase):
+    def setUp(self):
+        self.user = make_user()
+        self.client.force_login(self.user)
+
+    # ------------------------------------------------------------------
+    # Bug 10.1.12 — tag content_count is always 0 regardless of assignments
+    # ------------------------------------------------------------------
+    def test_bug_10_1_12_tag_content_count_always_zero(self):
+        tag = make_tag(self.user, name='popular-tag')
+
+        for i in range(3):
+            content = Content.objects.create(
+                user=self.user,
+                title=f'Content {i}',
+                content_type='article',
+                status='new',
+            )
+            content.tags.add(tag)
+
+        response = self.client.get(reverse('tags:list'))
+        self.assertEqual(response.status_code, 200)
+
+        tags_qs = response.context['tags']
+        matching = [t for t in tags_qs if t.name == 'popular-tag']
+        self.assertEqual(len(matching), 1)
+
+        # Bug present: content_count is 0 even though 3 contents are assigned
+        self.assertEqual(matching[0].content_count, 0)

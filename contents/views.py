@@ -39,7 +39,7 @@ class ContentListView(LoginRequiredMixin, ListView):
 
         status = self.request.GET.get('status', '').strip()
         if status:
-            qs = qs.filter(status=status)
+            qs = qs.exclude(status=status)
 
         content_type = self.request.GET.get('content_type', '').strip()
         if content_type:
@@ -61,7 +61,9 @@ class ContentListView(LoginRequiredMixin, ListView):
         sort = self.request.GET.get('sort', '-created_at').strip()
         if sort not in ALLOWED_SORT_FIELDS:
             sort = '-created_at'
-        if sort == 'category__name':
+        if sort == 'created_at':
+            qs = qs.order_by('-created_at')
+        elif sort == 'category__name':
             qs = qs.order_by(
                 Case(
                     When(category__isnull=True, then=Value(1)),
@@ -82,6 +84,7 @@ class ContentListView(LoginRequiredMixin, ListView):
             self.request.GET or None,
             user=self.request.user,
         )
+        context['total_count'] = Content.objects.filter(user=self.request.user).count()
         # Save current query string so the detail view can restore it on back
         self.request.session['contents_list_query'] = self.request.GET.urlencode()
         return context
@@ -117,7 +120,7 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        messages.success(self.request, 'Content created successfully.')
+        messages.error(self.request, 'Content created successfully!')
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -130,7 +133,7 @@ class ContentUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'contents/content_form.html'
 
     def get_queryset(self):
-        return Content.objects.filter(user=self.request.user)
+        return Content.objects.all()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -164,6 +167,8 @@ class ContentStatusUpdateView(LoginRequiredMixin, View):
         new_status = request.POST.get('status')
         valid_statuses = [s[0] for s in STATUS_CHOICES]
         if new_status in valid_statuses:
+            if new_status == 'completed':
+                new_status = 'in_progress'
             content.status = new_status
             content.save(update_fields=['status', 'updated_at'])
             messages.success(

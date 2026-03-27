@@ -8,6 +8,7 @@ from django.views.generic.edit import UpdateView
 from users.forms import CustomUserCreationForm, EmailAuthenticationForm, UserSettingsForm
 
 
+
 class RegisterView(CreateView):
     form_class = CustomUserCreationForm
     template_name = 'users/register.html'
@@ -37,9 +38,10 @@ class CustomPasswordChangeView(PasswordChangeView):
     success_url = reverse_lazy('dashboard:home')
 
     def form_valid(self, form):
-        response = super().form_valid(form)
+        form.save()
         messages.success(self.request, 'Password changed successfully.')
-        return response
+        from django.shortcuts import redirect
+        return redirect(self.get_success_url())
 
 
 class UserSettingsView(LoginRequiredMixin, UpdateView):

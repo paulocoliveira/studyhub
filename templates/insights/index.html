@@ -398,7 +398,7 @@
         return r.json().then(function(d) {
           // generate-insights returns {success, insights} not {success, html}
           if (d.success && d.insights) {
-            d.html = '<p class="whitespace-pre-wrap">' + d.insights.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') + '</p>';
+            d.html = d.insights;
           }
           return d;
         });

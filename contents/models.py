@@ -21,7 +21,7 @@ STATUS_CHOICES = [
 
 
 class Content(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=True)
     url = models.URLField(blank=True)
     preview_image_url = models.URLField(blank=True, max_length=500)
     content_type = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES)
@@ -40,7 +40,7 @@ class Content(models.Model):
     )
     category = models.ForeignKey(
         'categories.Category',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='contents',

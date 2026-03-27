@@ -415,8 +415,7 @@
         const endpoint = this.dataset.url;
 
         aiRequest(endpoint, 'POST', {title: title, url: url, content_type: contentType}, this, function(data) {
-            const desc = document.getElementById('id_description');
-            if (desc && data.description) desc.value = data.description;
+            if (data.description) document.getElementById('id_title').value = data.description;
         });
     });
 

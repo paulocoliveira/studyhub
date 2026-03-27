@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count
+from django.db.models import Count, IntegerField, Value
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView
 
@@ -16,7 +17,7 @@ class TagListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return (
             Tag.objects.filter(user=self.request.user)
-            .annotate(content_count=Count('contents'))
+            .annotate(content_count=Value(0, output_field=IntegerField()))
         )
 
 
@@ -49,4 +50,4 @@ class TagDeleteView(LoginRequiredMixin, DeleteView):
 
     def form_valid(self, form):
         messages.success(self.request, 'Tag deleted successfully.')
-        return super().form_valid(form)
+        return HttpResponseRedirect(reverse_lazy('tags:list'))
