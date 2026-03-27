@@ -103,7 +103,7 @@
     <div class='flex items-center justify-between mb-4'>
         <p class='text-sm text-zinc-600'>
             {% if page_obj %}
-                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ paginator.count }} item{{ paginator.count|pluralize }}
+                Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ total_count }} item{{ total_count|pluralize }}
                 {% if request.GET.show_completed != '1' %}
                 <span class='text-zinc-700'>· completed hidden</span>
                 {% endif %}

@@ -57,7 +57,7 @@ class SuggestCategoryView(LoginRequiredMixin, View):
             )
 
         category_names = list(
-            Category.objects.all().values_list('name', flat=True)
+            Category.objects.filter(user=request.user).values_list('name', flat=True)
         )
 
         if not category_names:
