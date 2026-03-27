@@ -444,22 +444,22 @@
 
 > **Goal:** Prepare the project for production deployment with Docker and final configurations.
 
-- [ ] **11.1 — Requirements & Dependencies**
-  - [ ] 11.1.1 — Create `requirements.txt` with all project dependencies and pinned versions (Django, anthropic, gunicorn, etc.)
-  - [ ] 11.1.2 — Create `.env.example` with all required environment variables: `SECRET_KEY`, `DEBUG`, `ANTHROPIC_API_KEY`, `ALLOWED_HOSTS`
-  - [ ] 11.1.3 — Update `core/settings.py` to read all sensitive settings from environment variables using `os.environ`
+- [X] **11.1 — Requirements & Dependencies**
+  - [X] 11.1.1 — Create `requirements.txt` with all project dependencies and pinned versions (Django, anthropic, gunicorn, etc.)
+  - [X] 11.1.2 — Create `.env.example` with all required environment variables: `SECRET_KEY`, `DEBUG`, `ANTHROPIC_API_KEY`, `ALLOWED_HOSTS`
+  - [X] 11.1.3 — Update `core/settings.py` to read all sensitive settings from environment variables using `os.environ`
 
-- [ ] **11.2 — Docker Setup**
-  - [ ] 11.2.1 — Create `Dockerfile`: Python 3.13 slim image, install dependencies, copy project, collect static files, expose port 8000, run with gunicorn
-  - [ ] 11.2.2 — Create `docker-compose.yml`: single service for the Django app, volume for SQLite database, environment variables from `.env` file
-  - [ ] 11.2.3 — Create `.dockerignore`: exclude `.git`, `__pycache__`, `*.pyc`, `.env`, `db.sqlite3`, `node_modules`
+- [X] **11.2 — Docker Setup**
+  - [X] 11.2.1 — Create `Dockerfile`: Python 3.13 slim image, install dependencies, copy project, collect static files, expose port 8000, run with gunicorn
+  - [X] 11.2.2 — Create `docker-compose.yml`: single service for the Django app, volume for SQLite database, environment variables from `.env` file
+  - [X] 11.2.3 — Create `.dockerignore`: exclude `.git`, `__pycache__`, `*.pyc`, `.env`, `db.sqlite3`, `node_modules`
 
-- [ ] **11.3 — Static Files & Production Settings**
-  - [ ] 11.3.1 — Configure `STATIC_ROOT` and run `collectstatic`
-  - [ ] 11.3.2 — Add `whitenoise` middleware for serving static files in production
-  - [ ] 11.3.3 — Set `DEBUG = False` handling, configure `ALLOWED_HOSTS` from environment
+- [X] **11.3 — Static Files & Production Settings**
+  - [X] 11.3.1 — Configure `STATIC_ROOT` and run `collectstatic`
+  - [X] 11.3.2 — Add `whitenoise` middleware for serving static files in production
+  - [X] 11.3.3 — Set `DEBUG = False` handling, configure `ALLOWED_HOSTS` from environment
 
-- [ ] **11.4 — Documentation**
-  - [ ] 11.4.1 — Create `README.md` with: project description, features list, tech stack, setup instructions (local and Docker), environment variables reference, and screenshots placeholder
-  - [ ] 11.4.2 — Add inline code comments to complex views and services
-  - [ ] 11.4.3 — Create `CHANGELOG.md` with version 1.0 release notes
+- [X] **11.4 — Documentation**
+  - [X] 11.4.1 — Create `README.md` with: project description, features list, tech stack, setup instructions (local and Docker), environment variables reference, and screenshots placeholder
+  - [X] 11.4.2 — Add inline code comments to complex views and services
+  - [X] 11.4.3 — Create `CHANGELOG.md` with version 1.0 release notes

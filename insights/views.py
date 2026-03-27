@@ -15,13 +15,16 @@ from .services import AIService, check_rate_limit
 def _render_markdown(text):
     """Convert basic markdown to HTML for safe display. Escapes HTML first."""
     import html
+    # Escape all HTML entities before injecting any markup so user-supplied
+    # or AI-generated content cannot break out of the rendered block
     text = html.escape(text)
     # bold: **text**
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
     # numbered list items — wrap consecutive <li> blocks in <ol>
     text = re.sub(r'(?m)^(\d+)\. (.+)$', r'<li>\2</li>', text)
     text = re.sub(r'((?:<li>[^<]*</li>\n?)+)', r'<ol class="list-decimal list-inside space-y-1">\1</ol>', text)
-    # bullet list items — use placeholder tag to avoid collision, then wrap in <ul>
+    # Bullet list items use a placeholder tag (<blt>) to avoid matching the
+    # <li> tags already emitted for numbered lists above
     text = re.sub(r'(?m)^[-•] (.+)$', r'<blt>\1</blt>', text)
     text = re.sub(
         r'((?:<blt>[^<]*</blt>\n?)+)',
@@ -244,7 +247,9 @@ class ChatView(LoginRequiredMixin, View):
         if not message:
             return JsonResponse({'success': False, 'error': 'Message is required'}, status=400)
 
-        # validate history structure
+        # Sanitize the conversation history sent by the client: only keep entries
+        # that are dicts with a valid role ('user'|'assistant') and non-empty content.
+        # This prevents the client from injecting arbitrary roles into the Anthropic call.
         if not isinstance(history, list):
             history = []
         history = [
