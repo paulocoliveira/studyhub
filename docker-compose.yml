@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite_data:/app/db.sqlite3
+      - media_data:/app/media
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  sqlite_data:
+  media_data:
