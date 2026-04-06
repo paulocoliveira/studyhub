@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
 ]
 
+CSRF_TRUSTED_ORIGINS = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',')
 
 # Application definition
 
@@ -135,6 +136,12 @@ ALLOWED_UPLOAD_EXTENSIONS = [
     '.mp3', '.mp4', '.doc', '.docx', '.txt', '.md',
 ]
 MAX_UPLOAD_SIZE_MB = 10
+
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 # Auth
 AUTH_USER_MODEL = 'users.CustomUser'
