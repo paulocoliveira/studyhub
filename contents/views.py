@@ -120,7 +120,7 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        messages.error(self.request, 'Content created successfully!')
+        messages.success(self.request, 'Content created successfully.')
         return super().form_valid(form)
 
     def get_success_url(self):

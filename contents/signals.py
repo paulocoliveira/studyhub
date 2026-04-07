@@ -1,8 +1,12 @@
+import logging
+
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from .models import Content
 from .services import LinkPreviewService
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=Content)
@@ -28,3 +32,6 @@ def fetch_preview_on_save(sender, instance, **kwargs):
     preview = LinkPreviewService().fetch_preview(instance.url)
     if preview and preview.get('preview_image_url'):
         instance.preview_image_url = preview['preview_image_url']
+        logger.info('Preview image fetched for %s: %s', instance.url, instance.preview_image_url)
+    else:
+        logger.warning('No preview image found for URL: %s', instance.url)
