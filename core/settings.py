@@ -141,6 +141,9 @@ ALLOWED_UPLOAD_EXTENSIONS = [
 MAX_UPLOAD_SIZE_MB = 10
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
