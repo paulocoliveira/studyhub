@@ -21,8 +21,7 @@ This document describes the system as it **should work**. Use it as the source o
 
 Before doing anything else:
 
-👉 Access the bug tracking tool:  
-https://gira.paulocoliveira.com/
+👉 Access the bug tracking tool: [Click Here](https://gira.paulocoliveira.com/)
 
 - Create your account
 - After creating your account, **associate yourself with a project that has your team's name**
@@ -35,8 +34,7 @@ All bugs, issues, and observations should be logged there.
 
 ### 2. Application Under Test
 
-👉 StudyHub application:  
-https://studyhub.paulocoliveira.com/
+👉 StudyHub application: [Click Here](https://studyhub.paulocoliveira.com/)
 
 This is the system your team will test during the hackathon.
 
