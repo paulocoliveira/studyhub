@@ -5,11 +5,95 @@
 
 ## Welcome
 
-You're about to test **StudyHub**, a real web application built in Django. Your team's mission is to explore, understand, and test this system — finding issues, gaps, and risks that a real user or a real QA team would care about.
+You're about to test **StudyHub**, a real web application built in Python and Django.
+
+Your team's mission is to explore, understand, and test this system — identifying issues, risks, and improvement opportunities that a real QA team would care about.
+
+Improvements are also very welcome.
 
 This document describes the system as it **should work**. Use it as the source of truth for expected behaviour when designing your test strategy.
 
-At the end of the session, your team will have **3 minutes** to present your strategy to the room.
+---
+
+## Hackathon Setup & Instructions
+
+### 1. Bug Tracking Tool (Start Here)
+
+Before doing anything else:
+
+👉 Access the bug tracking tool:  
+https://gira.paulocoliveira.com/
+
+- Create your account
+- After creating your account, **associate yourself with a project that has your team's name**
+
+⚠️ This is the **first step** and must be completed before starting testing.
+
+All bugs, issues, and observations should be logged there.
+
+---
+
+### 2. Application Under Test
+
+👉 StudyHub application:  
+https://studyhub.paulocoliveira.com/
+
+This is the system your team will test during the hackathon.
+
+---
+
+### 3. OpenAI API Keys (Per Team)
+
+Each team will receive an OpenAI API key to use AI features inside the application.
+
+> ⚠️ Use only your team's key. Do not share across teams.
+
+| Team | API Key |
+|------|--------|
+| Team 1 | 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 |
+| Team 2 | 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 |
+| Team 3 | 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 |
+| Team 4 | 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 |
+| Team 5 | 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 |
+| Team 6 | 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 |
+| Team 7 | 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 |
+| Team 8 | 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 |
+| Team 9 | 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 |
+| Team 10 | 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 |
+
+These keys are required to test AI-powered features.
+
+---
+
+### 4. Testing Guidelines
+
+Your team is free to explore the system in your own way. 
+
+---
+
+### 5. Important Restrictions
+
+🚫 Do **NOT** perform:
+
+- Performance testing (load, stress, spike)
+- Any tests intended to overload, break, or degrade the hosting server
+
+Focus on realistic QA scenarios.
+
+---
+
+### 6. Final Presentation (3 minutes)
+
+At the end of the session, your team will present your work.
+
+Focus on:
+
+- The **team’s experience during the hackathon**
+- The **strategy you chose and why**
+- The **approach and techniques used**
+- The **key learnings and insights from your testing**
+
+> ⚠️ Avoid turning this into a bug list presentation — focus on how you worked and what you learned. You don't need a ppt, we prefer speaking only.
 
 ---
 
@@ -291,32 +375,4 @@ CONTENT ↔ TAG  (many-to-many)
 
 ---
 
-## Scope of the Hackathon
-
-Your team is free to focus on any area of the system. Some angles to consider:
-
-- **Functional testing** — does every feature behave as documented above?
-- **Boundary and edge cases** — what happens with empty data, very long text, special characters, max file sizes?
-- **User flows** — are multi-step journeys (register → add content → categorize → complete) consistent and correct?
-- **Data integrity** — does deleting a category correctly null-out contents? Do tags detach correctly?
-- **UI/UX consistency** — are all states covered (empty state, single item, many items, error state)?
-- **Access control** — can a user access or modify another user's data by manipulating URLs?
-- **AI features** — does the system degrade gracefully when AI is unavailable or rate-limited?
-- **Filtering and sorting** — do all filter combinations work correctly? Does pagination preserve state?
-- **File upload** — are validations (type, size) applied consistently client-side and server-side?
-- **Responsiveness** — does the layout hold up on mobile and tablet?
-
----
-
-## Presentation (3 minutes)
-
-At the end of the session, each team presents:
-
-1. **Strategy chosen** — what area did you focus on and why?
-2. **Approach and tools** — how did your team test? (manual exploratory, checklists, automation, API calls, dev tools…)
-3. **What you found** — bugs, gaps, risks, or surprises (without spoiling for other teams if possible)
-4. **What you'd do next** — if you had more time, where would you dig deeper?
-
----
-
-*Good luck — and may the best bugs win.*
+*Good luck!*
