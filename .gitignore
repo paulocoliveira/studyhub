@@ -268,3 +268,13 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,django
 # Playwright MCP runtime artifacts
 .playwright-mcp/
+
+# Playwright Test
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+.playwright-cli/
+
+node_modules/
+aula07-playwright-*.log

@@ -1,0 +1,27 @@
+{
+  "name": "studyhub",
+  "version": "1.0.0",
+  "description": "A personal knowledge management tool to organize and track your learning content.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paulocoliveira/studyhub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/paulocoliveira/studyhub/issues"
+  },
+  "homepage": "https://github.com/paulocoliveira/studyhub#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}
