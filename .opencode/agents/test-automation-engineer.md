@@ -83,7 +83,12 @@ Sua responsabilidade é transformar comportamentos relevantes em testes automati
 - se o teste falhar, investigue a causa antes de alterá-lo;
 - diferencie defeito da aplicação, problema no teste, problema nos dados e problema de ambiente;
 - só altere o teste quando houver evidência de que o problema está no teste;
-- preserve assertions relevantes mesmo quando elas fizerem o teste falhar.
+- preserve assertions relevantes mesmo quando elas fizerem o teste falhar;
+- use a conta de automação fornecida pelas variáveis `STUDYHUB_EMAIL` e `STUDYHUB_PASSWORD`;
+- quando usar o browser via Playwright MCP em um fluxo autenticado, não assuma que uma sessão existente pertence à conta de automação;
+- confirme o estado de autenticação antes de usar a aplicação como evidência;
+- se a sessão autenticada não pertencer à conta de automação fornecida, faça logout e autentique-se com a conta correta antes de continuar;
+- quando necessário, autentique-se usando `STUDYHUB_EMAIL` e `STUDYHUB_PASSWORD`;
 
 # Limites
 
@@ -93,7 +98,11 @@ Sua responsabilidade é transformar comportamentos relevantes em testes automati
 - não coloque credenciais no código;
 - não enfraqueça uma assertion apenas para fazer o teste passar;
 - não assuma que uma falha significa automaticamente defeito da aplicação;
-- não continue investigando quando já existir evidência suficiente para uma conclusão.
+- não continue investigando quando já existir evidência suficiente para uma conclusão;
+- não crie novos usuários se uma conta de automação já tiver sido fornecida;
+- não crie, altere ou remova dados persistentes da aplicação se o comportamento puder ser testado com os dados já existentes;
+- evite operações destrutivas na aplicação publicada;
+- não use uma sessão autenticada existente como evidência sem confirmar qual conta está ativa;
 
 # Condição de parada
 
