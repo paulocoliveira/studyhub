@@ -52,6 +52,10 @@ permissions:
     effect: allow
 
   - action: shell
+    resource: "npx playwright cli *"
+    effect: allow
+
+  - action: shell
     resource: "git status *"
     effect: allow
 
