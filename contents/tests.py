@@ -2,7 +2,7 @@ import io
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from categories.models import Category
@@ -125,6 +125,144 @@ class ContentStatusUpdateAndDeleteTest(TestCase):
         )
         self.assertRedirects(response, reverse('contents:list'))
         self.assertFalse(Content.objects.filter(pk=pk).exists())
+
+
+class ContentQuickCompleteTest(TestCase):
+    def setUp(self):
+        self.user = make_user()
+        self.client.force_login(self.user)
+
+    def test_new_content_can_be_quick_completed_and_listing_context_is_preserved(self):
+        content = make_content(self.user, status='new')
+        listing_url = f'{reverse("contents:list")}?search=Test&sort=title&page=2'
+
+        response = self.client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk}),
+            HTTP_REFERER=listing_url,
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], listing_url)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'completed')
+
+    def test_in_progress_content_can_be_quick_completed(self):
+        content = make_content(self.user, status='in_progress')
+
+        response = self.client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk}),
+            HTTP_REFERER=reverse('contents:list'),
+        )
+
+        self.assertEqual(response.status_code, 302)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'completed')
+
+    def test_quick_completed_content_is_hidden_by_default(self):
+        content = make_content(self.user, status='new')
+        self.client.post(reverse('contents:quick_complete', kwargs={'pk': content.pk}))
+
+        response = self.client.get(reverse('contents:list'))
+
+        self.assertNotContains(response, content.title)
+
+    def test_new_content_has_quick_complete_action_in_both_listing_views(self):
+        content = make_content(
+            self.user,
+            status='new',
+            preview_image_url='https://example.com/preview.png',
+        )
+
+        response = self.client.get(reverse('contents:list'))
+
+        self.assertContains(response, content.title)
+        self.assertContains(response, 'Quick Complete', count=2)
+
+    def test_quick_completed_content_remains_visible_when_completed_are_shown(self):
+        content = make_content(
+            self.user,
+            status='new',
+            preview_image_url='https://example.com/preview.png',
+        )
+        self.client.post(reverse('contents:quick_complete', kwargs={'pk': content.pk}))
+
+        response = self.client.get(reverse('contents:list'), {'show_completed': '1'})
+
+        self.assertContains(response, content.title)
+        self.assertContains(response, 'Completed')
+
+    def test_completed_content_has_no_quick_complete_action(self):
+        content = make_content(
+            self.user,
+            status='completed',
+            preview_image_url='https://example.com/preview.png',
+        )
+
+        response = self.client.get(
+            reverse('contents:list'),
+            {'show_completed': '1'},
+        )
+
+        self.assertContains(response, content.title)
+        self.assertNotContains(response, 'Quick Complete')
+
+    def test_completed_content_cannot_be_quick_completed(self):
+        content = make_content(self.user, status='completed')
+
+        response = self.client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'completed')
+
+    def test_quick_complete_does_not_accept_get(self):
+        content = make_content(self.user, status='new')
+
+        response = self.client.get(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk})
+        )
+
+        self.assertEqual(response.status_code, 405)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'new')
+
+    def test_cannot_quick_complete_content_owned_by_another_user(self):
+        other_user = make_user('other@example.com')
+        content = make_content(other_user, status='new')
+
+        response = self.client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'new')
+
+    def test_external_referer_redirects_to_contents_list(self):
+        content = make_content(self.user, status='new')
+
+        response = self.client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk}),
+            HTTP_REFERER='https://external.example/contents/?page=2',
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], reverse('contents:list'))
+
+    def test_quick_complete_requires_csrf(self):
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(self.user)
+        content = make_content(self.user, status='new')
+
+        response = csrf_client.post(
+            reverse('contents:quick_complete', kwargs={'pk': content.pk})
+        )
+
+        self.assertEqual(response.status_code, 403)
+        content.refresh_from_db()
+        self.assertEqual(content.status, 'new')
 
 
 class ContentFilteringTest(TestCase):

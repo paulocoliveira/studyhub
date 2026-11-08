@@ -279,6 +279,15 @@
                             <path d='M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2'/>
                         </svg>
                     </a>
+                    {% if content.status != 'completed' %}
+                    <form method='POST' action='{% url "contents:quick_complete" content.pk %}'>
+                        {% csrf_token %}
+                        <button type='submit'
+                            class='px-2 py-1 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-all duration-200'>
+                            Quick Complete
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
 
             </article>

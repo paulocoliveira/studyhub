@@ -6,6 +6,7 @@ from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import View
 from django.views.generic import (
     CreateView,
@@ -175,6 +176,28 @@ class ContentStatusUpdateView(LoginRequiredMixin, View):
             )
         referer = request.META.get('HTTP_REFERER')
         return redirect(referer or reverse('contents:list'))
+
+
+class ContentQuickCompleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        content = get_object_or_404(
+            Content.objects.filter(
+                user=request.user,
+                status__in=['new', 'in_progress'],
+            ),
+            pk=pk,
+        )
+        content.status = 'completed'
+        content.save(update_fields=['status', 'updated_at'])
+        messages.success(request, 'Status updated to Completed.')
+        referer = request.META.get('HTTP_REFERER')
+        if referer and url_has_allowed_host_and_scheme(
+            referer,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            return redirect(referer)
+        return redirect(reverse('contents:list'))
 
 
 class FetchMetadataView(LoginRequiredMixin, View):
