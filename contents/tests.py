@@ -293,9 +293,9 @@ class BugVerificationTests(TestCase):
         self.assertEqual(titles_oldest, titles_newest)
 
     # ------------------------------------------------------------------
-    # Bug 10.1.8 — mark completed saves in_progress instead
+    # Regression: mark completed must persist the completed status.
     # ------------------------------------------------------------------
-    def test_bug_10_1_8_mark_completed_saves_in_progress(self):
+    def test_mark_completed_saves_completed_status(self):
         content = make_content(self.user, status='new')
         self.client.post(
             reverse('contents:status_update', kwargs={'pk': content.pk}),
@@ -303,8 +303,7 @@ class BugVerificationTests(TestCase):
             HTTP_REFERER=reverse('contents:list'),
         )
         content.refresh_from_db()
-        # Bug present: status is saved as in_progress, not completed
-        self.assertEqual(content.status, 'in_progress')
+        self.assertEqual(content.status, 'completed')
 
     # ------------------------------------------------------------------
     # Bug 10.1.9 — total_count ignores active filters
