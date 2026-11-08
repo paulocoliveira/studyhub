@@ -167,8 +167,6 @@ class ContentStatusUpdateView(LoginRequiredMixin, View):
         new_status = request.POST.get('status')
         valid_statuses = [s[0] for s in STATUS_CHOICES]
         if new_status in valid_statuses:
-            if new_status == 'completed':
-                new_status = 'in_progress'
             content.status = new_status
             content.save(update_fields=['status', 'updated_at'])
             messages.success(
