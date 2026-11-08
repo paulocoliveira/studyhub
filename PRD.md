@@ -129,6 +129,7 @@ The purpose of StudyHub is to provide a centralized, organized, and intelligent 
 - **FR-28:** When a URL is entered on the content form, the system must fetch Open Graph metadata (title and description) on field blur and auto-fill the title and description fields if they are empty. The fetch is user-triggered (field blur), never on every page render
 - **FR-29:** When a URL is entered on the content form, the system may auto-detect the content type from the URL host (e.g. YouTube → video, Spotify → podcast, Udemy/Coursera → course) and set the type field if the user has not made a selection
 - **FR-30:** On the content edit form, a "Refresh Preview" button must allow the user to re-fetch the Open Graph image for the saved URL on demand
+- **FR-54:** Users must be able to Quick Complete content with status New or In Progress directly from either Card View or List View. The content must be updated to Completed and the listing must reflect the existing Completed visibility rule while preserving the applicable listing context.
 
 ### 6.5 Categories
 
@@ -695,6 +696,7 @@ The active toggle button receives `bg-zinc-700 text-white`; the inactive one sta
 | US-16 | As a user, I want to see my content in a card grid view with thumbnail images | Content list has a toggle for card/list view. Cards show a thumbnail chosen by priority: uploaded image file (if an image type) → Open Graph preview image → content-type placeholder. Toggle preference persists via `localStorage`. |
 | US-17 | As a user, I want to see link preview images on my content cards | When content has a URL, the system extracts the Open Graph image (with a YouTube oEmbed fallback) and displays it on the card. If no preview image is found, a content-type placeholder is shown. |
 | US-18 | As a user, I want to upload a local file when saving content | Content form has an optional file upload field. Accepted formats: PDF, JPG, JPEG, PNG, GIF, WebP, MP3, MP4, DOC, DOCX, TXT, MD. Max size: 10MB. Validation is enforced both client-side and server-side. |
+| US-40 | As a user, I want to quickly complete content from the listing | New or In Progress content can be marked as Completed directly from Card View or List View. The item follows the existing Completed visibility rule, and the current listing context is preserved after the action. |
 
 ### Epic 4: Categories
 
