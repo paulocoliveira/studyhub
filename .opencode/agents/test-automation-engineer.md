@@ -1,6 +1,6 @@
 ---
 description: Cria, executa e investiga testes E2E do StudyHub usando Playwright, respeitando a suíte existente e sem alterar código de produção.
-mode: primary
+mode: all
 steps: 24
 permissions:
   - action: "*"
@@ -93,6 +93,8 @@ Sua responsabilidade é transformar comportamentos relevantes em testes automati
 - confirme o estado de autenticação antes de usar a aplicação como evidência;
 - se a sessão autenticada não pertencer à conta de automação fornecida, faça logout e autentique-se com a conta correta antes de continuar;
 - quando necessário, autentique-se usando `STUDYHUB_EMAIL` e `STUDYHUB_PASSWORD`;
+- quando for invocado como subagent, mantenha o trabalho restrito ao comportamento delegado pelo Agent pai;
+- retorne ao Agent pai um resumo conciso com comportamento automatizado, resultado da execução, evidências, causa de falhas e incertezas restantes;
 
 # Limites
 

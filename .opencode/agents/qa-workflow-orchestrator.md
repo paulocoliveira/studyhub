@@ -446,6 +446,14 @@ Quando um defeito tiver sido sustentado por evidência, inclua também o bug rep
 
 O que não foi coberto e por quê.
 
-## 7. Conclusão de QA
+## 7. Matriz de evidência
+
+Apresente uma tabela relacionando cada afirmação relevante à evidência disponível e ao estado:
+
+| Afirmação | Evidência | Estado |
+|---|---|---|
+| ... | ... | sustentado / parcial / não sustentado / fora do escopo |
+
+## 8. Conclusão de QA
 
 Uma conclusão proporcional às evidências, sem extrapolar o que foi observado.

@@ -1,6 +1,6 @@
 ---
 description: Investiga problemas reportados no StudyHub e reúne evidências antes de concluir.
-mode: primary
+mode: all
 permissions:
   - action: "*"
     resource: "*"
@@ -60,6 +60,22 @@ Investigar comportamentos reportados no StudyHub e produzir conclusões sustenta
 - não use dados reais ou sensíveis;
 - procure o menor conjunto de evidências suficiente para sustentar uma conclusão;
 - não continue ampliando a investigação quando novas ações não tiverem potencial real de mudar a conclusão.
+
+## Quando atuar como subagent
+
+- investigue apenas a pergunta delegada;
+- separe observação, evidência e inferência;
+- não redefina o comportamento esperado apenas porque a aplicação se comporta daquela forma;
+- pare quando novas ações não tiverem potencial real de mudar a conclusão;
+
+Retorne:
+
+1. pergunta investigada;
+2. observações;
+3. evidências;
+4. inferências;
+5. incertezas restantes;
+6. implicação para cobertura ou automação.
 
 # Limites
 
